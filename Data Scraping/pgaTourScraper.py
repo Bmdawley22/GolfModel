@@ -24,6 +24,8 @@ def setup_driver():
 
 
 def select_year(driver, year_to_select):
+    print("Running select_year function")
+
     try:
         # Wait for the dropdown button to be clickable (button with a child span containing exactly "Season")
         dropdown = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
@@ -62,6 +64,93 @@ def select_year(driver, year_to_select):
         sys.exit()
 
 
+def select_tourney(driver):
+    print("Running select_tourney function")
+
+    try:
+        # Wait for all elements with id containing "menu-button" to be present
+        menu_buttons = WebDriverWait(driver, 5).until(
+            EC.presence_of_all_elements_located(
+                (By.XPATH, "//*[contains(@id, 'menu-button')]"))
+        )
+
+        print(len(menu_buttons))
+
+        i = 1
+        for menu_button in menu_buttons:
+
+            span_elements = menu_button.find_elements(
+                By.XPATH, ".//span[text()='Tournament']")
+
+            if span_elements:
+                print(
+                    f"A child span of menu button {i} with the text 'Tournament' was found.")
+
+                driver.execute_script(
+                    "arguments[0].click();", menu_button)
+                print("Tournament dropdown clicked")
+            else:
+                print(
+                    f"No child span of menu buttons {i} found with the text 'Tournament' was found.")
+            i += 1
+
+        # Find the button with the text "Masters Tournament"
+        masters_button = driver.find_element(
+            By.XPATH, "//button[text()='Masters Tournament']")
+        print("Masters Tournament button found.")
+
+        # Find the parent div of the Masters Tournament button
+        tournament_menu = masters_button.find_element(
+            By.XPATH, "./ancestor::div[contains(@class, 'chakra-menu__menu-list')]")
+        print("Parent tournament dropdown menu found.")
+
+        # Find all child buttons within the parent div
+        tournament_buttons = tournament_menu.find_elements(
+            By.TAG_NAME, "button")
+
+        # Extract the text of each button into the Tournaments array
+        Tournaments = [button.text.strip() for button in tournament_buttons]
+
+        for i, tournament in enumerate(Tournaments, 1):
+            print(f"{i}. {tournament}")
+
+        # Prompt the user to select a tournament
+        choice = 0
+        while True:
+            try:
+                choice = int(
+                    input("Enter the number of the tournament you want YTD data for.  NOTE: the tournament before the tournament you choose will be selected as we want YTD stats UP TO that tournament: "))
+                if 1 <= choice <= len(Tournaments):
+                    selected_tournament = Tournaments[choice - 1]
+                    ytd_tourney = Tournaments[choice] # Tournament before is lower in the list
+                    print(f"Selected Tournament: {selected_tournament}")
+                    break
+                else:
+                    print(
+                        f"Please enter a number between 1 and {len(Tournaments)}.")
+            except ValueError:
+                print("Please enter a valid number.")
+
+        # Find the button with the text "Masters Tournament"
+        ytd_tourney_button = driver.find_element(
+            By.XPATH, f"//button[text()='{ytd_tourney}']")
+        print(f"{ytd_tourney} button found.")
+
+        driver.execute_script(
+            "arguments[0].click();", ytd_tourney_button)
+        print(f"{ytd_tourney} button clicked.")
+
+        time.sleep(5)
+
+        # driver.quit()
+        # sys.exit()
+
+    except Exception as e:
+        print(f"Error occurred with selecting tournament: {e}")
+        driver.quit()
+        sys.exit()
+
+
 def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024"):
     driver = setup_driver()
     try:
@@ -77,6 +166,10 @@ def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024"
         time.sleep(2)
 
         select_year(driver, stat_year)
+
+        time.sleep(2)
+
+        select_tourney(driver)
 
         # Find all rows in the table
         rows = driver.find_elements(By.CLASS_NAME, "css-paaamq")
