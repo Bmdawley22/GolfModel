@@ -186,12 +186,7 @@ def extract_table(driver, stat_name):
 
         # Check if the row has the expected number of cells (5 for data rows)
         if len(cells) < 6:
-            print(
-                f"Skipping row with {len(cells)} cells: {[cell.text for cell in cells]}")
             continue
-        # else:
-            # print(
-            #     f"Save row with {len(cells)} cells: {[cell.text for cell in cells]}")
 
         try:
             distance_stat_names = ["Distance From Edge of Fairway", "Fairway Proximity", "Approaches from > 200",
@@ -202,7 +197,7 @@ def extract_table(driver, stat_name):
                                   "3-Putt Avoidance", "Putting 5-15ft"]
 
             if stat_name in distance_stat_names:
-                if stat_name in ["Fairway Proximity", "Approaches from > 200", "Approaches from Rough > 200", "Proximity from Rough (Short)", "Proximity from 30+", "Proximity ATG"]:
+                if stat_name in ["Approaches from > 200", "Approaches from Rough > 200", "Proximity from Rough (Short)", "Proximity from 30+", "Proximity ATG"]:
                     # Player name is in the 4th cell from the end
                     player = cells[-5].text.strip()
 
@@ -210,6 +205,15 @@ def extract_table(driver, stat_name):
                     total_feet = float(cells[-3].text.strip().replace(",", ""))
                     total_strokes = float(
                         cells[-2].text.strip().replace(",", ""))
+                    avg = round(total_feet / total_strokes, 2)
+                elif stat_name == "Fairway Proximity":
+                    # Player name is in the 4th cell from the end
+                    player = cells[-5].text.strip()
+
+                    # Calculate average using Total Feet divided by Total Strokes
+                    total_feet = float(cells[-2].text.strip().replace(",", ""))
+                    total_strokes = float(
+                        cells[-3].text.strip().replace(",", ""))
                     avg = round(total_feet / total_strokes, 2)
                 else:
                     # Player name is in the 4th cell from the end
@@ -308,23 +312,23 @@ def main():
         url_list = [
             {"url": "https://www.pgatour.com/stats/detail/101",
                 "stat_name": "Average Driving Distance"},
-            # {"url": "https://www.pgatour.com/stats/detail/02402",
-            #     "stat_name": "Ball Speed"},
+            {"url": "https://www.pgatour.com/stats/detail/02402",
+                "stat_name": "Ball Speed"},
             # {"url": "https://www.pgatour.com/stats/detail/02420",
             #     "stat_name": "Distance From Edge of Fairway"},
             # {"url": "https://www.pgatour.com/stats/detail/02435",
             #     "stat_name": "Rough Tendency"},
             # {"url": "https://www.pgatour.com/stats/detail/103",
             #     "stat_name": "GIR"},
-            # {"url": "https://www.pgatour.com/stats/detail/431",
-            #     "stat_name": "Fairway Proximity"},
+            {"url": "https://www.pgatour.com/stats/detail/431",
+                "stat_name": "Fairway Proximity"},
             # {"url": "https://www.pgatour.com/stats/detail/336",
             #     "stat_name": "Approaches from > 200"},
             # {"url": "https://www.pgatour.com/stats/detail/419",
             #     "stat_name": "Going for Green"},
             # {"url": "https://www.pgatour.com/stats/detail/199",
             #     "stat_name": "GIR from Other than Fairway"},
-            # {"url": "https://www.pgatour.com/stats/detail/366",
+            # {"url": "https://www.pgatour.com/stats/detail/375",
             #     "stat_name": "Proximity from Sand (Short)"},
             # {"url": "https://www.pgatour.com/stats/detail/376",
             #     "stat_name": "Proximity from Rough (Short)"},
