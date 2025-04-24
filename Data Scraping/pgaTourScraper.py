@@ -64,7 +64,7 @@ def select_year(driver, year_to_select):
         sys.exit()
 
 
-def select_tourney(driver):
+def select_tourney(driver, prev_selected_tourney=''):
     print("Running select_tourney function")
 
     try:
@@ -74,7 +74,7 @@ def select_tourney(driver):
                 (By.XPATH, "//*[contains(@id, 'menu-button')]"))
         )
 
-        print(len(menu_buttons))
+        # print(len(menu_buttons))
 
         i = 1
         for menu_button in menu_buttons:
@@ -83,24 +83,26 @@ def select_tourney(driver):
                 By.XPATH, ".//span[text()='Tournament']")
 
             if span_elements:
-                print(
-                    f"A child span of menu button {i} with the text 'Tournament' was found.")
+                # print(
+                #     f"A child span of menu button {i} with the text 'Tournament' was found.")
 
                 driver.execute_script(
                     "arguments[0].click();", menu_button)
                 print("Tournament dropdown clicked")
-            else:
-                print(
-                    f"No child span of menu buttons {i} found with the text 'Tournament' was found.")
+            # else:
+                # print(
+                # f"No child span of menu buttons {i} found with the text 'Tournament' was found.")
             i += 1
 
-        # Find the button with the text "Masters Tournament"
-        masters_button = driver.find_element(
-            By.XPATH, "//button[text()='Masters Tournament']")
-        print("Masters Tournament button found.")
+        # Wait for the button with the text "The Sentry" to be located
+        sentry_button = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//button[text()='The Sentry']"))
+        )
+        # print("The Sentry Tournament button found.")
 
         # Find the parent div of the Masters Tournament button
-        tournament_menu = masters_button.find_element(
+        tournament_menu = sentry_button.find_element(
             By.XPATH, "./ancestor::div[contains(@class, 'chakra-menu__menu-list')]")
         print("Parent tournament dropdown menu found.")
 
@@ -114,22 +116,30 @@ def select_tourney(driver):
         for i, tournament in enumerate(Tournaments, 1):
             print(f"{i}. {tournament}")
 
-        # Prompt the user to select a tournament
-        choice = 0
-        while True:
-            try:
-                choice = int(
-                    input("Enter the number of the tournament you want YTD data for.  NOTE: the tournament before the tournament you choose will be selected as we want YTD stats UP TO that tournament: "))
-                if 1 <= choice <= len(Tournaments):
-                    selected_tournament = Tournaments[choice - 1]
-                    ytd_tourney = Tournaments[choice] # Tournament before is lower in the list
-                    print(f"Selected Tournament: {selected_tournament}")
-                    break
-                else:
-                    print(
-                        f"Please enter a number between 1 and {len(Tournaments)}.")
-            except ValueError:
-                print("Please enter a valid number.")
+        if len(prev_selected_tourney) == 0:
+            # Prompt the user to select a tournament
+            choice = 0
+            while True:
+                try:
+                    choice = int(
+                        input("Enter the number of the tournament you want YTD data for.  NOTE: the tournament before the tournament you choose will be selected as we want YTD stats UP TO that tournament: "))
+                    if 1 <= choice <= len(Tournaments):
+                        # the list of tournaments to select starts at one so the index of the array is choice - 1
+                        selected_tournament = Tournaments[choice - 1]
+                        # Tournament before is lower in the list (index = selected_tournament index + 1)
+                        ytd_tourney = Tournaments[choice]
+                        break
+                    else:
+                        print(
+                            f"Please enter a number between 1 and {len(Tournaments)}.")
+                except ValueError:
+                    print("Please enter a valid number.")
+        else:
+            selected_tournament = prev_selected_tourney
+            ytd_tourney = Tournaments[Tournaments.index(
+                prev_selected_tourney) + 1]
+
+        print(f"Selected Tournament: {selected_tournament}")
 
         # Find the button with the text "Masters Tournament"
         ytd_tourney_button = driver.find_element(
@@ -142,6 +152,8 @@ def select_tourney(driver):
 
         time.sleep(5)
 
+        return selected_tournament
+
         # driver.quit()
         # sys.exit()
 
@@ -151,7 +163,7 @@ def select_tourney(driver):
         sys.exit()
 
 
-def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024"):
+def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024", selected_tourney=''):
     driver = setup_driver()
     try:
         # Navigate to the page
@@ -169,7 +181,7 @@ def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024"
 
         time.sleep(2)
 
-        select_tourney(driver)
+        selected_tourney = select_tourney(driver, selected_tourney)
 
         # Find all rows in the table
         rows = driver.find_elements(By.CLASS_NAME, "css-paaamq")
@@ -219,14 +231,14 @@ def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024"
         if players and averages:
             data = {"Player": players, stat_name: averages}
             df = pd.DataFrame(data)
-            return df
+            return df, selected_tourney
         else:
             print("No data extracted.")
-            return None
+            return None, selected_tourney
 
     except Exception as e:
         print(f"Error occurred: {e}")
-        return None
+        return None, selected_tourney
 
     finally:
         driver.quit()
@@ -254,6 +266,7 @@ def main():
 
     # List to store DataFrames
     all_dfs = []
+    selected_tourney = ''
 
     # Loop through each URL and scrape the data
     for url_info in url_list:
@@ -261,7 +274,8 @@ def main():
         stat_name = url_info["stat_name"]
         print(
             f"Scraping data from {url} for {stat_name} for year {args.year}...")
-        df = scrape_pga_table(url, stat_name, args.year)
+        df, selected_tourney = scrape_pga_table(
+            url, stat_name, args.year, selected_tourney)
         if df is not None:
             all_dfs.append(df)
         else:
