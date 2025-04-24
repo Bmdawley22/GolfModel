@@ -11,52 +11,39 @@ import time
 # Set up Selenium with Chrome to avoid bot detection
 
 
-def setup_driver(headless=False):
+def setup_driver():
     chrome_options = Options()
     chrome_options.add_argument(
         "--disable-blink-features=AutomationControlled")
-    if headless:
-        chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")  # Run in headless mode
     chrome_options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
-    chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--disable-gpu")
     driver = webdriver.Chrome(options=chrome_options)
     return driver
 
 
 def select_year(driver, year_to_select):
     print("\nRunning select_year function...")
-
     try:
         # Wait for the dropdown button to be clickable (button with a child span containing exactly "Season")
         dropdown = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
             (By.CSS_SELECTOR, 'button[aria-label="Season"]')))
-
-        print("Season dropdown button found.")
-
         driver.execute_script("arguments[0].click();", dropdown)
+        print("Season dropdown found and clicked")
 
-        print("Season dropdown clicked")
-
-        # Find the year option using its text
+        # Find the button corresponding to the year_to_select
         year_option = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable(
                 (By.XPATH, f"//div[contains(@id, 'menu-list-')]//button[contains(text(), '{year_to_select}')]"))
         )
-
-        print(f"{year_to_select} option found")
-
         driver.execute_script("arguments[0].click();", year_option)
+        print(f"{year_to_select} option found and clicked")
 
-        print("Year clicked.")
-
+        # Wait for year to change
         WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable(
                 (By.XPATH, f"//p[contains(text(), '{year_to_select}')]"))
         )
-
         print(f"Year changed to: {year_to_select}\n")
 
     except Exception as e:
@@ -67,7 +54,6 @@ def select_year(driver, year_to_select):
 
 def select_tourney(driver, prev_selected_tourney='', prev_tourney_before=''):
     print("Running select_tourney function...")
-
     try:
         # Wait for all elements with id containing "menu-button" to be present
         menu_buttons = WebDriverWait(driver, 5).until(
@@ -77,31 +63,26 @@ def select_tourney(driver, prev_selected_tourney='', prev_tourney_before=''):
 
         i = 1
         for menu_button in menu_buttons:
-
             span_elements = menu_button.find_elements(
                 By.XPATH, ".//span[text()='Tournament']")
 
             if span_elements:
-                # print(
-                #     f"A child span of menu button {i} with the text 'Tournament' was found.")
-
                 driver.execute_script(
                     "arguments[0].click();", menu_button)
                 print("Tournament dropdown clicked")
-            # else:
-                # print(
-                # f"No child span of menu buttons {i} found with the text 'Tournament' was found.")
             i += 1
 
-        # Wait for the button with the text "The Sentry" to be located
-        sentry_button = WebDriverWait(driver, 5).until(
+        # Wait for the button with the text "Masters Tournament" to be located
+        # Note: won't be able to locate if you're modeling a tourney before the masters
+        tourney_button = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located(
-                (By.XPATH, "//button[text()='The Sentry']"))
+                (By.XPATH, "//button[text()='Masters Tournament' or text()='The Sentry']"))
         )
-        # print("The Sentry Tournament button found.")
+
+        print("Masters button found")
 
         # Find the parent div of the Masters Tournament button
-        tournament_menu = sentry_button.find_element(
+        tournament_menu = tourney_button.find_element(
             By.XPATH, "./ancestor::div[contains(@class, 'chakra-menu__menu-list')]")
         print("Tournament dropdown menu found.")
 
@@ -112,6 +93,7 @@ def select_tourney(driver, prev_selected_tourney='', prev_tourney_before=''):
         # Extract the text of each button into the Tournaments array
         Tournaments = [button.text.strip() for button in tournament_buttons]
 
+        # Only want to select the tourney once
         if len(prev_selected_tourney) == 0:
             for i, tournament in enumerate(Tournaments, 1):
                 print(f"{i}. {tournament}")
@@ -197,7 +179,7 @@ def extract_table(driver, stat_name):
                                   "3-Putt Avoidance", "Putting 5-15ft"]
 
             if stat_name in distance_stat_names:
-                if stat_name in ["Approaches from > 200", "Approaches from Rough > 200", "Proximity from Rough (Short)", "Proximity from 30+", "Proximity ATG"]:
+                if stat_name in ["Approaches from > 200", "Approaches from Rough > 200", "Proximity from Sand (Short)", "Proximity from Rough (Short)", "Proximity from 30+", "Proximity ATG"]:
                     # Player name is in the 4th cell from the end
                     player = cells[-5].text.strip()
 
@@ -258,7 +240,8 @@ def extract_table(driver, stat_name):
     return players, averages
 
 
-def scrape_pga_table(driver, url, stat_name="Average_Driving_Distance", stat_year="2024", selected_tourney='', tourney_before_selected=''):
+def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024", selected_tourney='', tourney_before_selected=''):
+    driver = setup_driver()
     try:
         # Navigate to the page
         driver.get(url)
@@ -306,63 +289,57 @@ def main():
 
     args = parser.parse_args()
 
-    try:
-        # List of URLs and corresponding stat names
-        # You'll update this list with the actual URLs and stat names
-        url_list = [
-            {"url": "https://www.pgatour.com/stats/detail/101",
-                "stat_name": "Average Driving Distance"},
-            {"url": "https://www.pgatour.com/stats/detail/02402",
-                "stat_name": "Ball Speed"},
-            # {"url": "https://www.pgatour.com/stats/detail/02420",
-            #     "stat_name": "Distance From Edge of Fairway"},
-            # {"url": "https://www.pgatour.com/stats/detail/02435",
-            #     "stat_name": "Rough Tendency"},
-            # {"url": "https://www.pgatour.com/stats/detail/103",
-            #     "stat_name": "GIR"},
-            {"url": "https://www.pgatour.com/stats/detail/431",
-                "stat_name": "Fairway Proximity"},
-            # {"url": "https://www.pgatour.com/stats/detail/336",
-            #     "stat_name": "Approaches from > 200"},
-            # {"url": "https://www.pgatour.com/stats/detail/419",
-            #     "stat_name": "Going for Green"},
-            # {"url": "https://www.pgatour.com/stats/detail/199",
-            #     "stat_name": "GIR from Other than Fairway"},
-            # {"url": "https://www.pgatour.com/stats/detail/375",
-            #     "stat_name": "Proximity from Sand (Short)"},
-            # {"url": "https://www.pgatour.com/stats/detail/376",
-            #     "stat_name": "Proximity from Rough (Short)"},
-            # {"url": "https://www.pgatour.com/stats/detail/379",
-            #     "stat_name": "Proximity from 30+"},
-            # {"url": "https://www.pgatour.com/stats/detail/374",
-            #     "stat_name": "Proximity ATG"},
-            # {"url": "https://www.pgatour.com/stats/detail/426",
-            #     "stat_name": "3-Putt Avoidance"},
-            # {"url": "https://www.pgatour.com/stats/detail/02327",
-            #     "stat_name": "Putting 5-15ft"}
-        ]
+    # List of URLs and corresponding stat names
+    # You'll update this list with the actual URLs and stat names
+    url_list = [
+        # {"url": "https://www.pgatour.com/stats/detail/101",
+        #     "stat_name": "Average Driving Distance"},
+        # {"url": "https://www.pgatour.com/stats/detail/02402",
+        #     "stat_name": "Ball Speed"},
+        # {"url": "https://www.pgatour.com/stats/detail/02420",
+        #     "stat_name": "Distance From Edge of Fairway"},
+        # {"url": "https://www.pgatour.com/stats/detail/02435",
+        #     "stat_name": "Rough Tendency"},
+        # {"url": "https://www.pgatour.com/stats/detail/103",
+        #     "stat_name": "GIR"},
+        # {"url": "https://www.pgatour.com/stats/detail/431",
+        #     "stat_name": "Fairway Proximity"},
+        # {"url": "https://www.pgatour.com/stats/detail/336",
+        #     "stat_name": "Approaches from > 200"},
+        # {"url": "https://www.pgatour.com/stats/detail/419",
+        #     "stat_name": "Going for Green"},
+        # {"url": "https://www.pgatour.com/stats/detail/199",
+        #     "stat_name": "GIR from Other than Fairway"},
+        {"url": "https://www.pgatour.com/stats/detail/375",
+            "stat_name": "Proximity from Sand (Short)"},
+        # {"url": "https://www.pgatour.com/stats/detail/376",
+        #     "stat_name": "Proximity from Rough (Short)"},
+        # {"url": "https://www.pgatour.com/stats/detail/379",
+        #     "stat_name": "Proximity from 30+"},
+        # {"url": "https://www.pgatour.com/stats/detail/374",
+        #     "stat_name": "Proximity ATG"},
+        # {"url": "https://www.pgatour.com/stats/detail/426",
+        #     "stat_name": "3-Putt Avoidance"},
+        # {"url": "https://www.pgatour.com/stats/detail/02327",
+        #     "stat_name": "Putting 5-15ft"}
+    ]
+    # List to store DataFrames
+    all_dfs = []
+    selected_tourney = ''
+    tourney_before_selected = ''
 
-        # List to store DataFrames
-        all_dfs = []
-        selected_tourney = ''
-        tourney_before_selected = ''
-
-        driver = setup_driver()  # input True if you want to run in headless
-
-        # Loop through each URL and scrape the data
-        for url_info in url_list:
-            url = url_info["url"]
-            stat_name = url_info["stat_name"]
-            print(
-                f"\nScraping data from {url} for {stat_name} for year {args.year}...")
-            df, selected_tourney, tourney_before_selected = scrape_pga_table(
-                driver, url, stat_name, args.year, selected_tourney, tourney_before_selected)
-            if df is not None:
-                all_dfs.append(df)
-            else:
-                print(f"Failed to scrape data from {url}")
-    finally:
-        driver.quit()
+    # Loop through each URL and scrape the data
+    for url_info in url_list:
+        url = url_info["url"]
+        stat_name = url_info["stat_name"]
+        print(
+            f"\nScraping data from {url} for {stat_name} for year {args.year}...")
+        df, selected_tourney, tourney_before_selected = scrape_pga_table(
+            url, stat_name, args.year, selected_tourney, tourney_before_selected)
+        if df is not None:
+            all_dfs.append(df)
+        else:
+            print(f"Failed to scrape data from {url}")
 
     # Combine all DataFrames on the "Player" column
     if all_dfs:
@@ -380,12 +357,13 @@ def main():
         print("\nCombined DataFrame:")
         print(combined_df)
 
-        # Save to CSV
+        # # Save to CSV
         # combined_df.to_csv(
         #     f"ytd_thru_{selected_tourney}_{args.year}.csv", index=False)
+        # print(f"Data exported to ytd_thru_{selected_tourney}_{args.year}.csv")
         combined_df.to_csv(
             f"temp.csv", index=False)
-        print(f"ytd_thru_{selected_tourney}_{args.year}.csv")
+        print(f"Data exported to temp.csv")
 
         # df = pd.DataFrame(url_list)[["stat_name", "url"]]
         # df.columns = ["Stat Names", "URLs"]
