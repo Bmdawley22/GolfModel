@@ -11,13 +11,17 @@ import time
 # Set up Selenium with Chrome to avoid bot detection
 
 
-def setup_driver():
+def setup_driver(headless=False):
     chrome_options = Options()
     chrome_options.add_argument(
         "--disable-blink-features=AutomationControlled")
-    chrome_options.add_argument("--headless")  # Run in headless mode
+    if headless:
+        chrome_options.add_argument("--headless")
     chrome_options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-gpu")
     driver = webdriver.Chrome(options=chrome_options)
     return driver
 
@@ -250,8 +254,7 @@ def extract_table(driver, stat_name):
     return players, averages
 
 
-def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024", selected_tourney='', tourney_before_selected=''):
-    driver = setup_driver()
+def scrape_pga_table(driver, url, stat_name="Average_Driving_Distance", stat_year="2024", selected_tourney='', tourney_before_selected=''):
     try:
         # Navigate to the page
         driver.get(url)
@@ -299,58 +302,63 @@ def main():
 
     args = parser.parse_args()
 
-    # List of URLs and corresponding stat names
-    # You'll update this list with the actual URLs and stat names
-    url_list = [
-        {"url": "https://www.pgatour.com/stats/detail/101",
-            "stat_name": "Average Driving Distance"},
-        {"url": "https://www.pgatour.com/stats/detail/02402",
-            "stat_name": "Ball Speed"},
-        {"url": "https://www.pgatour.com/stats/detail/02420",
-            "stat_name": "Distance From Edge of Fairway"},
-        {"url": "https://www.pgatour.com/stats/detail/02435",
-            "stat_name": "Rough Tendency"},
-        {"url": "https://www.pgatour.com/stats/detail/103",
-            "stat_name": "GIR"},
-        {"url": "https://www.pgatour.com/stats/detail/431",
-            "stat_name": "Fairway Proximity"},
-        {"url": "https://www.pgatour.com/stats/detail/336",
-            "stat_name": "Approaches from > 200"},
-        {"url": "https://www.pgatour.com/stats/detail/419",
-            "stat_name": "Going for Green"},
-        {"url": "https://www.pgatour.com/stats/detail/199",
-            "stat_name": "GIR from Other than Fairway"},
-        {"url": "https://www.pgatour.com/stats/detail/366",
-            "stat_name": "Proximity from Sand (Short)"},
-        {"url": "https://www.pgatour.com/stats/detail/376",
-            "stat_name": "Proximity from Rough (Short)"},
-        {"url": "https://www.pgatour.com/stats/detail/379",
-            "stat_name": "Proximity from 30+"},
-        {"url": "https://www.pgatour.com/stats/detail/374",
-            "stat_name": "Proximity ATG"},
-        {"url": "https://www.pgatour.com/stats/detail/426",
-            "stat_name": "3-Putt Avoidance"},
-        {"url": "https://www.pgatour.com/stats/detail/02327",
-            "stat_name": "Putting 5-15ft"}
-    ]
+    try:
+        # List of URLs and corresponding stat names
+        # You'll update this list with the actual URLs and stat names
+        url_list = [
+            {"url": "https://www.pgatour.com/stats/detail/101",
+                "stat_name": "Average Driving Distance"},
+            # {"url": "https://www.pgatour.com/stats/detail/02402",
+            #     "stat_name": "Ball Speed"},
+            # {"url": "https://www.pgatour.com/stats/detail/02420",
+            #     "stat_name": "Distance From Edge of Fairway"},
+            # {"url": "https://www.pgatour.com/stats/detail/02435",
+            #     "stat_name": "Rough Tendency"},
+            # {"url": "https://www.pgatour.com/stats/detail/103",
+            #     "stat_name": "GIR"},
+            # {"url": "https://www.pgatour.com/stats/detail/431",
+            #     "stat_name": "Fairway Proximity"},
+            # {"url": "https://www.pgatour.com/stats/detail/336",
+            #     "stat_name": "Approaches from > 200"},
+            # {"url": "https://www.pgatour.com/stats/detail/419",
+            #     "stat_name": "Going for Green"},
+            # {"url": "https://www.pgatour.com/stats/detail/199",
+            #     "stat_name": "GIR from Other than Fairway"},
+            # {"url": "https://www.pgatour.com/stats/detail/366",
+            #     "stat_name": "Proximity from Sand (Short)"},
+            # {"url": "https://www.pgatour.com/stats/detail/376",
+            #     "stat_name": "Proximity from Rough (Short)"},
+            # {"url": "https://www.pgatour.com/stats/detail/379",
+            #     "stat_name": "Proximity from 30+"},
+            # {"url": "https://www.pgatour.com/stats/detail/374",
+            #     "stat_name": "Proximity ATG"},
+            # {"url": "https://www.pgatour.com/stats/detail/426",
+            #     "stat_name": "3-Putt Avoidance"},
+            # {"url": "https://www.pgatour.com/stats/detail/02327",
+            #     "stat_name": "Putting 5-15ft"}
+        ]
 
-    # List to store DataFrames
-    all_dfs = []
-    selected_tourney = ''
-    tourney_before_selected = ''
+        # List to store DataFrames
+        all_dfs = []
+        selected_tourney = ''
+        tourney_before_selected = ''
 
-    # Loop through each URL and scrape the data
-    for url_info in url_list:
-        url = url_info["url"]
-        stat_name = url_info["stat_name"]
-        print(
-            f"\nScraping data from {url} for {stat_name} for year {args.year}...")
-        df, selected_tourney, tourney_before_selected = scrape_pga_table(
-            url, stat_name, args.year, selected_tourney, tourney_before_selected)
-        if df is not None:
-            all_dfs.append(df)
-        else:
-            print(f"Failed to scrape data from {url}")
+        driver = setup_driver()  # input True if you want to run in headless
+
+        # Loop through each URL and scrape the data
+        for url_info in url_list:
+            url = url_info["url"]
+            stat_name = url_info["stat_name"]
+            print(
+                f"\nScraping data from {url} for {stat_name} for year {args.year}...")
+            df, selected_tourney, tourney_before_selected = scrape_pga_table(
+                driver, url, stat_name, args.year, selected_tourney, tourney_before_selected)
+            if df is not None:
+                all_dfs.append(df)
+            else:
+                print(f"Failed to scrape data from {url}")
+    finally:
+        driver.quit()
 
     # Combine all DataFrames on the "Player" column
     if all_dfs:
@@ -369,10 +377,10 @@ def main():
         print(combined_df)
 
         # Save to CSV
-        combined_df.to_csv(
-            f"ytd_thru_{selected_tourney}_{args.year}.csv", index=False)
         # combined_df.to_csv(
-        #     f"temp.csv", index=False)
+        #     f"ytd_thru_{selected_tourney}_{args.year}.csv", index=False)
+        combined_df.to_csv(
+            f"temp.csv", index=False)
         print(f"ytd_thru_{selected_tourney}_{args.year}.csv")
 
         # df = pd.DataFrame(url_list)[["stat_name", "url"]]
