@@ -15,16 +15,15 @@ def setup_driver():
     chrome_options = Options()
     chrome_options.add_argument(
         "--disable-blink-features=AutomationControlled")
+    chrome_options.add_argument("--headless")  # Run in headless mode
     chrome_options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
     driver = webdriver.Chrome(options=chrome_options)
     return driver
 
-# Scrape the table from the PGA Tour stats page
-
 
 def select_year(driver, year_to_select):
-    print("Running select_year function")
+    print("\nRunning select_year function...")
 
     try:
         # Wait for the dropdown button to be clickable (button with a child span containing exactly "Season")
@@ -49,23 +48,21 @@ def select_year(driver, year_to_select):
 
         print("Year clicked.")
 
-        time.sleep(2)
-
         WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable(
                 (By.XPATH, f"//p[contains(text(), '{year_to_select}')]"))
         )
 
-        print(f"Year changed to: {year_to_select}")
+        print(f"Year changed to: {year_to_select}\n")
 
     except Exception as e:
-        print(f"Error occurred with selecting year: {e}")
+        print(f"\nError occurred with selecting year: {e}\n")
         driver.quit()
         sys.exit()
 
 
-def select_tourney(driver, prev_selected_tourney=''):
-    print("Running select_tourney function")
+def select_tourney(driver, prev_selected_tourney='', prev_tourney_before=''):
+    print("Running select_tourney function...")
 
     try:
         # Wait for all elements with id containing "menu-button" to be present
@@ -73,8 +70,6 @@ def select_tourney(driver, prev_selected_tourney=''):
             EC.presence_of_all_elements_located(
                 (By.XPATH, "//*[contains(@id, 'menu-button')]"))
         )
-
-        # print(len(menu_buttons))
 
         i = 1
         for menu_button in menu_buttons:
@@ -104,7 +99,7 @@ def select_tourney(driver, prev_selected_tourney=''):
         # Find the parent div of the Masters Tournament button
         tournament_menu = sentry_button.find_element(
             By.XPATH, "./ancestor::div[contains(@class, 'chakra-menu__menu-list')]")
-        print("Parent tournament dropdown menu found.")
+        print("Tournament dropdown menu found.")
 
         # Find all child buttons within the parent div
         tournament_buttons = tournament_menu.find_elements(
@@ -113,57 +108,149 @@ def select_tourney(driver, prev_selected_tourney=''):
         # Extract the text of each button into the Tournaments array
         Tournaments = [button.text.strip() for button in tournament_buttons]
 
-        for i, tournament in enumerate(Tournaments, 1):
-            print(f"{i}. {tournament}")
-
         if len(prev_selected_tourney) == 0:
+            for i, tournament in enumerate(Tournaments, 1):
+                print(f"{i}. {tournament}")
+
             # Prompt the user to select a tournament
             choice = 0
             while True:
                 try:
                     choice = int(
-                        input("Enter the number of the tournament you want YTD data for.  NOTE: the tournament before the tournament you choose will be selected as we want YTD stats UP TO that tournament: "))
+                        input("\nEnter the number of the tournament you want data up to.\nNOTE: Select the tournament before the one you are modeling:\n "))
                     if 1 <= choice <= len(Tournaments):
                         # the list of tournaments to select starts at one so the index of the array is choice - 1
                         selected_tournament = Tournaments[choice - 1]
-                        # Tournament before is lower in the list (index = selected_tournament index + 1)
-                        ytd_tourney = Tournaments[choice]
+                        # save tournament before in case the next stat doesn't have this tourney
+                        tourney_before_selected = Tournaments[choice]
                         break
                     else:
                         print(
-                            f"Please enter a number between 1 and {len(Tournaments)}.")
+                            f"\nPlease enter a number between 1 and {len(Tournaments)}.\n")
                 except ValueError:
-                    print("Please enter a valid number.")
+                    print("\nPlease enter a valid number.\n")
         else:
-            selected_tournament = prev_selected_tourney
-            ytd_tourney = Tournaments[Tournaments.index(
-                prev_selected_tourney) + 1]
+            # set tourney_before_selected variable as we wnat to keep this info through each run
+            tourney_before_selected = prev_tourney_before
+            # check if selected tourney button is available for the current stat we're running
+            if prev_selected_tourney in Tournaments:
+                selected_tournament = prev_selected_tourney
+            else:
+                # if prev_selected_tourney not shown for current stat, move to the tourney before
+                print(
+                    f"{prev_selected_tourney} not found. Moving to tournament before: {tourney_before_selected}")
+                selected_tournament = tourney_before_selected
 
-        print(f"Selected Tournament: {selected_tournament}")
+        print(f"\nSelected Tournament: {selected_tournament}")
 
-        # Find the button with the text "Masters Tournament"
-        ytd_tourney_button = driver.find_element(
-            By.XPATH, f"//button[text()='{ytd_tourney}']")
-        print(f"{ytd_tourney} button found.")
+        # Find the button with text the same as the selected tournament
+        selected_button = driver.find_element(
+            By.XPATH, f"//button[text()='{selected_tournament}']")
+        print(f"{selected_tournament} button found.")
 
         driver.execute_script(
-            "arguments[0].click();", ytd_tourney_button)
-        print(f"{ytd_tourney} button clicked.")
+            "arguments[0].click();", selected_button)
+        print(f"{selected_tournament} button clicked.\n")
 
-        time.sleep(5)
+        time.sleep(2)
 
-        return selected_tournament
+        if len(prev_selected_tourney) > 0:
+            selected_tournament = prev_selected_tourney
 
-        # driver.quit()
-        # sys.exit()
+        return selected_tournament, tourney_before_selected
 
     except Exception as e:
         print(f"Error occurred with selecting tournament: {e}")
+        print(Tournaments)
         driver.quit()
         sys.exit()
 
 
-def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024", selected_tourney=''):
+def extract_table(driver, stat_name):
+    print(f"Extracting {stat_name} data...\n")
+    # Find all rows in the table
+    rows = driver.find_elements(By.CLASS_NAME, "css-paaamq")
+
+    # Lists to store data
+    players = []
+    averages = []
+
+    # Skip the header row (row-0) and process data rows
+    for row in rows:
+        # Extract cells in the row
+        cells = row.find_elements(By.TAG_NAME, "span")
+
+        # Check if the row has the expected number of cells (5 for data rows)
+        if len(cells) < 6:
+            print(
+                f"Skipping row with {len(cells)} cells: {[cell.text for cell in cells]}")
+            continue
+        # else:
+            # print(
+            #     f"Save row with {len(cells)} cells: {[cell.text for cell in cells]}")
+
+        try:
+            distance_stat_names = ["Distance From Edge of Fairway", "Fairway Proximity", "Approaches from > 200",
+                                   "Rough Proximity", "Approaches from Rough > 200", "Approaches from Rough > 200",
+                                   "Proximity from Sand (Short)", "Proximity from Rough (Short)", "Proximity from 30+",
+                                   "Proximity ATG"]
+            percent_stat_names = ["Rough Tendency", "GIR", "Going for Green", "GIR from Other than Fairway",
+                                  "3-Putt Avoidance", "Putting 5-15ft"]
+
+            if stat_name in distance_stat_names:
+                if stat_name in ["Fairway Proximity", "Approaches from > 200", "Approaches from Rough > 200", "Proximity from Rough (Short)", "Proximity from 30+", "Proximity ATG"]:
+                    # Player name is in the 4th cell from the end
+                    player = cells[-5].text.strip()
+
+                    # Calculate average using Total Feet divided by Total Strokes
+                    total_feet = float(cells[-3].text.strip().replace(",", ""))
+                    total_strokes = float(
+                        cells[-2].text.strip().replace(",", ""))
+                    avg = round(total_feet / total_strokes, 2)
+                else:
+                    # Player name is in the 4th cell from the end
+                    player = cells[-4].text.strip()
+
+                    # Calculate average using Total Feet divided by Total Strokes
+                    total_feet = float(cells[-2].text.strip().replace(",", ""))
+                    total_strokes = float(
+                        cells[-1].text.strip().replace(",", ""))
+                    avg = round(total_feet / total_strokes, 2)
+            elif stat_name in percent_stat_names:
+                if stat_name in ["GIR from Other than Fairway", "3-Putt Avoidance", "Putting 5-15ft"]:
+                    # Player name is in the 5th cell from the end
+                    player = cells[-4].text.strip()
+                    # Avg data is in the 4th cell from the end
+                    avg = round(float(cells[-3].text.strip('%')) / 100, 4)
+                elif stat_name == "Going for Green":
+                    # Player name is in the 5th cell from the end
+                    player = cells[-6].text.strip()
+                    # Avg data is in the 4th cell from the end
+                    avg = round(float(cells[-5].text.strip('%')) / 100, 4)
+                else:
+                    # Player name is in the 5th cell from the end
+                    player = cells[-5].text.strip()
+                    # Avg data is in the 4th cell from the end
+                    avg = round(float(cells[-4].text.strip('%')) / 100, 4)
+            else:
+                # Player name is in the 4th cell from the end
+                player = cells[-4].text.strip()
+                # Avg data is in the 3rd cell from the end
+                avg = cells[-3].text.strip()
+
+            players.append(player)
+            averages.append(float(avg))
+        except Exception as e:
+            print(
+                f"Error processing row for player {player if 'player' in locals() else 'unknown'}: {e}")
+            continue
+
+    print(f"////////////\n{stat_name} data extracted.\n////////////")
+
+    return players, averages
+
+
+def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024", selected_tourney='', tourney_before_selected=''):
     driver = setup_driver()
     try:
         # Navigate to the page
@@ -181,64 +268,23 @@ def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024"
 
         time.sleep(2)
 
-        selected_tourney = select_tourney(driver, selected_tourney)
+        selected_tourney, tourney_before_selected = select_tourney(
+            driver, selected_tourney, tourney_before_selected)
 
-        # Find all rows in the table
-        rows = driver.find_elements(By.CLASS_NAME, "css-paaamq")
-
-        # Lists to store data
-        players = []
-        averages = []
-
-        # Skip the header row (row-0) and process data rows
-        for row in rows:
-            # Extract cells in the row
-            cells = row.find_elements(By.TAG_NAME, "span")
-
-            # Check if the row has the expected number of cells (5 for data rows)
-            if len(cells) < 6:
-                print(
-                    f"Skipping row with {len(cells)} cells: {[cell.text for cell in cells]}")
-                continue
-            # else:
-                # print(
-                #     f"Save row with {len(cells)} cells: {[cell.text for cell in cells]}")
-
-            try:
-                # Player name is in the 4th cell from the end
-                player = cells[-4].text.strip()
-
-                if stat_name == "Distance_From_Edge_of_Fairway":
-                    # Calculate average using Total Feet divided by Total Strokes
-                    total_feet = float(cells[-2].text.strip().replace(",", ""))
-                    total_strokes = float(
-                        cells[-1].text.strip().replace(",", ""))
-                    avg = round(total_feet / total_strokes, 2)
-                else:
-                    # Player name is in the 4th cell from the end
-                    avg = cells[-3].text.strip()
-
-                players.append(player)
-                averages.append(float(avg))
-            except Exception as e:
-                print(
-                    f"Error processing row for player {player if 'player' in locals() else 'unknown'}: {e}")
-                continue
-
-        print(f"////////////\n{stat_name} data extracted.\n////////////")
+        players, averages = extract_table(driver, stat_name)
 
         # Create a DataFrame
         if players and averages:
             data = {"Player": players, stat_name: averages}
             df = pd.DataFrame(data)
-            return df, selected_tourney
+            return df, selected_tourney, tourney_before_selected
         else:
             print("No data extracted.")
-            return None, selected_tourney
+            return None, selected_tourney, tourney_before_selected
 
     except Exception as e:
         print(f"Error occurred: {e}")
-        return None, selected_tourney
+        return None, selected_tourney, tourney_before_selected
 
     finally:
         driver.quit()
@@ -257,25 +303,50 @@ def main():
     # You'll update this list with the actual URLs and stat names
     url_list = [
         {"url": "https://www.pgatour.com/stats/detail/101",
-            "stat_name": "Average_Driving_Distance"},
+            "stat_name": "Average Driving Distance"},
         {"url": "https://www.pgatour.com/stats/detail/02402",
-            "stat_name": "Ball_Speed"},
+            "stat_name": "Ball Speed"},
         {"url": "https://www.pgatour.com/stats/detail/02420",
-            "stat_name": "Distance_From_Edge_of_Fairway"}
+            "stat_name": "Distance From Edge of Fairway"},
+        {"url": "https://www.pgatour.com/stats/detail/02435",
+            "stat_name": "Rough Tendency"},
+        {"url": "https://www.pgatour.com/stats/detail/103",
+            "stat_name": "GIR"},
+        {"url": "https://www.pgatour.com/stats/detail/431",
+            "stat_name": "Fairway Proximity"},
+        {"url": "https://www.pgatour.com/stats/detail/336",
+            "stat_name": "Approaches from > 200"},
+        {"url": "https://www.pgatour.com/stats/detail/419",
+            "stat_name": "Going for Green"},
+        {"url": "https://www.pgatour.com/stats/detail/199",
+            "stat_name": "GIR from Other than Fairway"},
+        {"url": "https://www.pgatour.com/stats/detail/366",
+            "stat_name": "Proximity from Sand (Short)"},
+        {"url": "https://www.pgatour.com/stats/detail/376",
+            "stat_name": "Proximity from Rough (Short)"},
+        {"url": "https://www.pgatour.com/stats/detail/379",
+            "stat_name": "Proximity from 30+"},
+        {"url": "https://www.pgatour.com/stats/detail/374",
+            "stat_name": "Proximity ATG"},
+        {"url": "https://www.pgatour.com/stats/detail/426",
+            "stat_name": "3-Putt Avoidance"},
+        {"url": "https://www.pgatour.com/stats/detail/02327",
+            "stat_name": "Putting 5-15ft"}
     ]
 
     # List to store DataFrames
     all_dfs = []
     selected_tourney = ''
+    tourney_before_selected = ''
 
     # Loop through each URL and scrape the data
     for url_info in url_list:
         url = url_info["url"]
         stat_name = url_info["stat_name"]
         print(
-            f"Scraping data from {url} for {stat_name} for year {args.year}...")
-        df, selected_tourney = scrape_pga_table(
-            url, stat_name, args.year, selected_tourney)
+            f"\nScraping data from {url} for {stat_name} for year {args.year}...")
+        df, selected_tourney, tourney_before_selected = scrape_pga_table(
+            url, stat_name, args.year, selected_tourney, tourney_before_selected)
         if df is not None:
             all_dfs.append(df)
         else:
@@ -298,8 +369,16 @@ def main():
         print(combined_df)
 
         # Save to CSV
-        combined_df.to_csv("pga_stats_combined.csv", index=False)
-        print("Data saved to pga_stats_combined.csv")
+        combined_df.to_csv(
+            f"ytd_thru_{selected_tourney}_{args.year}.csv", index=False)
+        # combined_df.to_csv(
+        #     f"temp.csv", index=False)
+        print(f"ytd_thru_{selected_tourney}_{args.year}.csv")
+
+        # df = pd.DataFrame(url_list)[["stat_name", "url"]]
+        # df.columns = ["Stat Names", "URLs"]
+
+        # df.to_csv(f"stat_names_urls.csv", index=False)
     else:
         print("No data to combine.")
 
