@@ -15,7 +15,7 @@ def setup_driver():
     chrome_options = Options()
     chrome_options.add_argument(
         "--disable-blink-features=AutomationControlled")
-    # chrome_options.add_argument("--headless")  # Run in headless mode
+    chrome_options.add_argument("--headless")  # Run in headless mode
     chrome_options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
     driver = webdriver.Chrome(options=chrome_options)
@@ -292,36 +292,36 @@ def main():
     # List of URLs and corresponding stat names
     # You'll update this list with the actual URLs and stat names
     url_list = [
-        # {"url": "https://www.pgatour.com/stats/detail/101",
-        #     "stat_name": "Average Driving Distance"},
-        # {"url": "https://www.pgatour.com/stats/detail/02402",
-        #     "stat_name": "Ball Speed"},
-        # {"url": "https://www.pgatour.com/stats/detail/02420",
-        #     "stat_name": "Distance From Edge of Fairway"},
-        # {"url": "https://www.pgatour.com/stats/detail/02435",
-        #     "stat_name": "Rough Tendency"},
-        # {"url": "https://www.pgatour.com/stats/detail/103",
-        #     "stat_name": "GIR"},
-        # {"url": "https://www.pgatour.com/stats/detail/431",
-        #     "stat_name": "Fairway Proximity"},
-        # {"url": "https://www.pgatour.com/stats/detail/336",
-        #     "stat_name": "Approaches from > 200"},
-        # {"url": "https://www.pgatour.com/stats/detail/419",
-        #     "stat_name": "Going for Green"},
-        # {"url": "https://www.pgatour.com/stats/detail/199",
-        #     "stat_name": "GIR from Other than Fairway"},
+        {"url": "https://www.pgatour.com/stats/detail/101",
+            "stat_name": "Average Driving Distance"},
+        {"url": "https://www.pgatour.com/stats/detail/02402",
+            "stat_name": "Ball Speed"},
+        {"url": "https://www.pgatour.com/stats/detail/02420",
+            "stat_name": "Distance From Edge of Fairway"},
+        {"url": "https://www.pgatour.com/stats/detail/02435",
+            "stat_name": "Rough Tendency"},
+        {"url": "https://www.pgatour.com/stats/detail/103",
+            "stat_name": "GIR"},
+        {"url": "https://www.pgatour.com/stats/detail/431",
+            "stat_name": "Fairway Proximity"},
+        {"url": "https://www.pgatour.com/stats/detail/336",
+            "stat_name": "Approaches from > 200"},
+        {"url": "https://www.pgatour.com/stats/detail/419",
+            "stat_name": "Going for Green"},
+        {"url": "https://www.pgatour.com/stats/detail/199",
+            "stat_name": "GIR from Other than Fairway"},
         {"url": "https://www.pgatour.com/stats/detail/375",
             "stat_name": "Proximity from Sand (Short)"},
-        # {"url": "https://www.pgatour.com/stats/detail/376",
-        #     "stat_name": "Proximity from Rough (Short)"},
-        # {"url": "https://www.pgatour.com/stats/detail/379",
-        #     "stat_name": "Proximity from 30+"},
-        # {"url": "https://www.pgatour.com/stats/detail/374",
-        #     "stat_name": "Proximity ATG"},
-        # {"url": "https://www.pgatour.com/stats/detail/426",
-        #     "stat_name": "3-Putt Avoidance"},
-        # {"url": "https://www.pgatour.com/stats/detail/02327",
-        #     "stat_name": "Putting 5-15ft"}
+        {"url": "https://www.pgatour.com/stats/detail/376",
+            "stat_name": "Proximity from Rough (Short)"},
+        {"url": "https://www.pgatour.com/stats/detail/379",
+            "stat_name": "Proximity from 30+"},
+        {"url": "https://www.pgatour.com/stats/detail/374",
+            "stat_name": "Proximity ATG"},
+        {"url": "https://www.pgatour.com/stats/detail/426",
+            "stat_name": "3-Putt Avoidance"},
+        {"url": "https://www.pgatour.com/stats/detail/02327",
+            "stat_name": "Putting 5-15ft"}
     ]
     # List to store DataFrames
     all_dfs = []
@@ -358,13 +358,14 @@ def main():
         print(combined_df)
 
         # # Save to CSV
-        # combined_df.to_csv(
-        #     f"ytd_thru_{selected_tourney}_{args.year}.csv", index=False)
-        # print(f"Data exported to ytd_thru_{selected_tourney}_{args.year}.csv")
         combined_df.to_csv(
-            f"temp.csv", index=False)
-        print(f"Data exported to temp.csv")
+            f"ytd_thru_{selected_tourney}_{args.year}.csv", index=False)
+        print(f"Data exported to ytd_thru_{selected_tourney}_{args.year}.csv")
+        # combined_df.to_csv(
+        #     f"temp.csv", index=False)
+        # print(f"Data exported to temp.csv")
 
+        # Export Stat Name URLS to stat_name_urls.csv
         # df = pd.DataFrame(url_list)[["stat_name", "url"]]
         # df.columns = ["Stat Names", "URLs"]
 
