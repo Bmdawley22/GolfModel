@@ -79,7 +79,7 @@ def select_tourney(driver, prev_selected_tourney='', prev_tourney_before=''):
                 (By.XPATH, "//button[text()='Masters Tournament' or text()='The Sentry']"))
         )
 
-        print("Masters button found")
+        print("Masters or Sentry button found")
 
         # Find the parent div of the Masters Tournament button
         tournament_menu = tourney_button.find_element(
@@ -103,7 +103,7 @@ def select_tourney(driver, prev_selected_tourney='', prev_tourney_before=''):
             while True:
                 try:
                     choice = int(
-                        input("\nEnter the number of the tournament you want data up to.\nNOTE: Select the tournament before the one you are modeling:\n "))
+                        input("\nEnter the number of the tournament you are modeling.\nNOTE: Select the tournament before the one you are modeling:\n "))
                     if 1 <= choice <= len(Tournaments):
                         # the list of tournaments to select starts at one so the index of the array is choice - 1
                         selected_tournament = Tournaments[choice - 1]
@@ -127,7 +127,7 @@ def select_tourney(driver, prev_selected_tourney='', prev_tourney_before=''):
                     f"{prev_selected_tourney} not found. Moving to tournament before: {tourney_before_selected}")
                 selected_tournament = tourney_before_selected
 
-        print(f"\nSelected Tournament: {selected_tournament}")
+        print(f"\Tournament to select: {selected_tournament}")
 
         # Find the button with text the same as the selected tournament
         selected_button = driver.find_element(
