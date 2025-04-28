@@ -127,7 +127,7 @@ def select_tourney(driver, prev_selected_tourney='', prev_tourney_before=''):
                     f"{prev_selected_tourney} not found. Moving to tournament before: {tourney_before_selected}")
                 selected_tournament = tourney_before_selected
 
-        print(f"\Tournament to select: {selected_tournament}")
+        print(f"\nTournament to select: {selected_tournament}")
 
         # Find the button with text the same as the selected tournament
         selected_button = driver.find_element(
@@ -175,7 +175,7 @@ def extract_table(driver, stat_name):
                                    "Rough Proximity", "Approaches from Rough > 200", "Approaches from Rough > 200",
                                    "Proximity from Sand (Short)", "Proximity from Rough (Short)", "Proximity from 30+",
                                    "Proximity ATG"]
-            percent_stat_names = ["Rough Tendency", "GIR", "Going for Green", "GIR from Other than Fairway",
+            percent_stat_names = ["Driving Accuracy", "Rough Tendency", "GIR", "Going for Green", "GIR from Other than Fairway",
                                   "3-Putt Avoidance", "Putting 5-15ft"]
 
             if stat_name in distance_stat_names:
@@ -207,7 +207,7 @@ def extract_table(driver, stat_name):
                         cells[-1].text.strip().replace(",", ""))
                     avg = round(total_feet / total_strokes, 2)
             elif stat_name in percent_stat_names:
-                if stat_name in ["GIR from Other than Fairway", "3-Putt Avoidance", "Putting 5-15ft"]:
+                if stat_name in ["Driving Accuracy", "GIR from Other than Fairway", "3-Putt Avoidance", "Putting 5-15ft"]:
                     # Player name is in the 5th cell from the end
                     player = cells[-4].text.strip()
                     # Avg data is in the 4th cell from the end
@@ -296,6 +296,8 @@ def main():
             "stat_name": "Average Driving Distance"},
         {"url": "https://www.pgatour.com/stats/detail/02402",
             "stat_name": "Ball Speed"},
+        {"url": "https://www.pgatour.com/stats/detail/102",
+            "stat_name": "Driving Accuracy"},
         {"url": "https://www.pgatour.com/stats/detail/02420",
             "stat_name": "Distance From Edge of Fairway"},
         {"url": "https://www.pgatour.com/stats/detail/02435",

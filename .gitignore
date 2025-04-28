@@ -137,7 +137,7 @@ env.bak/
 venv.bak/
 
 # Ignore all csv files
-*.csv
+# *.csv
 
 # Spyder project settings
 .spyderproject

@@ -98,14 +98,14 @@ def get_tourney_scoring(driver, year, tourney, schedule):
         # Get the parent link tag from the p tag matching tourney
         tourney_link = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable(
-                (By.XPATH, "//p[text()='THE CJ CUP Byron Nelson']"))
+                (By.XPATH, f"//p[text()='{tourney}']"))
         ).find_element(By.XPATH, "./ancestor::a")
 
         driver.execute_script("arguments[0].click();", tourney_link)
         print(f"{tourney} link found and clicked")
 
         # Wait to make sure we've navigated to the correct tourney
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 15).until(
             EC.presence_of_element_located(
                 (By.XPATH, f"//h1[contains(text(), '{tourney}')]"))
         )
