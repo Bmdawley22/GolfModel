@@ -26,11 +26,16 @@ def setup_driver():
 # Function to get the PGA schedule for a given year and return the list of tourney names in order of occurrence
 
 
-def get_schedule(driver, year):
-    print(
-        f"\nRunning get_schedule on URL: https://www.pgatour.com/schedule/{year}...\n")
+def get_schedule(driver, year, tourney_completed):
     try:
-        driver.get(f"https://www.pgatour.com/schedule/{year}")
+        if tourney_completed:
+            print(
+                f"\nRunning get_schedule on URL: https://www.pgatour.com/schedule/{year}...\n")
+            driver.get(f"https://www.pgatour.com/schedule/{year}")
+        else:
+            print(
+                f"\nRunning get_schedule on URL: https://www.pgatour.com/schedule...\n")
+            driver.get(f"https://www.pgatour.com/schedule")
 
         # Wait until all <p> tags with class 'css-vgdvwe' are present
         all_tourneys_listed = WebDriverWait(driver, 10).until(
@@ -88,12 +93,12 @@ def select_tourney(tournaments):
 # Function to extract tournament scoring data and write to csv
 
 
-def get_tourney_scoring(driver, year, tourney, schedule):
-    print(f"\nRunning get_tourney_scoring for {year} {tourney}...\n")
+def extract_tourney_scoring(driver, year, tourney, schedule):
+    print(f"\nRunning extract_tourney_scoring for {year} {tourney}...\n")
     try:
         driver.get(f"https://www.pgatour.com/schedule/{year}")
 
-        print(f"Navigating to https://www.pgatour.com/schedule/{year}")
+        print(f"Navigated to https://www.pgatour.com/schedule/{year}.")
 
         # Get the parent link tag from the p tag matching tourney
         tourney_link = WebDriverWait(driver, 10).until(
@@ -217,11 +222,114 @@ def get_tourney_scoring(driver, year, tourney, schedule):
         return None
 
 
+def extract_field_and_odds(driver, year, tourney, schedule):
+    print(f"\nRunning get_field for {year} {tourney}...\n")
+    try:
+        driver.get(f"https://www.pgatour.com/schedule")
+
+        print(f"Navigated to https://www.pgatour.com/schedule.")
+
+        # Get the parent link tag from the p tag matching tourney
+        tourney_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(
+                (By.XPATH, f"//p[contains(@class, 'vgdvwe') and text()='{tourney}']"))
+        ).find_element(By.XPATH, "./ancestor::a")
+
+        driver.execute_script("arguments[0].click();", tourney_link)
+        print(f"{tourney} link found and clicked")
+
+        # Wait to make sure we've navigated to the correct tourney
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located(
+                (By.XPATH, f"//h1[contains(text(), '{tourney}')]"))
+        )
+        print(f"\nNavigated to {tourney}\n")
+
+        # Step 1: Extract Headers
+        header_cells = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.TAG_NAME, "thead"))
+        ).find_elements(By.TAG_NAME, "th")
+
+        print("Found scoring data table headers. Extracting data...")
+
+        # Extract text from headers
+        headers = []
+        for cell in header_cells:
+            # Some headers might have a <button> inside
+            try:
+                button = cell.find_element(By.TAG_NAME, "button")
+                headers.append(button.text.strip())
+            except:
+                headers.append(cell.text.strip())
+        headers.append('')
+
+        print("Headers extracted.")
+
+        # Find all rows in the table once table is loaded
+        rows = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.TAG_NAME, "tbody"))
+        ).find_elements(By.CSS_SELECTOR, "tr[class*='player-']")
+
+        print("Found scoring data table rows. Extracting data...")
+
+        # Prepare list for data
+        data = []
+
+        for row in rows:
+            # Find all cells (td) in the row
+            cells = row.find_elements(By.TAG_NAME, "td")
+            cell_texts = [cell.text.strip() for cell in cells]
+            if "(a)" in cell_texts[2]:
+                continue
+
+            data.append(cell_texts)
+
+        print("\nScoring table extracted.\n")
+
+        # Step 3: Create DataFrame
+        df = pd.DataFrame(data, columns=headers[:len(data[0])])
+
+        print(df)
+
+        df = df[["PLAYER", "ODDS TO WIN"]]
+
+        print("Cleaned tabled columns.")
+
+        n_rows = len(df)
+
+        # First rows with data, the rest blank
+        year_col = [year] + [""] * (n_rows - 1)
+        tourney_col = [tourney] + [""] * (n_rows - 1)
+        schedule_col = schedule + [""] * (n_rows - len(schedule))
+
+        # Add data information columns YEAR, TOURNAMENT, SCHEDULE
+        df["YEAR"] = year_col
+        df["TOURNAMENT"] = tourney_col
+        df["SCHEDULE"] = schedule_col
+        print("Added year, tourney, and schedule data to df")
+
+        print("\nUpdated DataFrame:")
+        print(df)
+
+        # # Save to CSV
+        # tourney = "cj_cup_byron_nelson"  # Set your tourney name dynamically if needed
+        df.to_csv(
+            f"{tourney.replace(" ", "_")}_{year}_scoring.csv", index=False)
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return None
+
+
 def main():
     parser = argparse.ArgumentParser(description="PGA Tour Model")
     # Example console command
     parser.add_argument('--years', nargs='+', type=int,
                         help='List of years to process')
+    parser.add_argument("--is-tourney-completed", type=int, choices=[0, 1], default=0,
+                        help="Set to 1 to predict using pre-existing weights, 0 to train a new model (default: 0)")
 
     args = parser.parse_args()
 
@@ -230,14 +338,14 @@ def main():
 
         for year in args.years:
 
-            schedule = get_schedule(driver, year)
+            schedule = get_schedule(driver, year, args.is_tourney_completed)
 
-            # commented out while developing
             tourney = select_tourney(schedule)
 
-            # players, scores_per_rd =
-            # hard coded tourney to be CJ cup for developing, "tourney" should be the arg
-            get_tourney_scoring(driver, year, tourney, schedule)
+            if args.is_tourney_completed:
+                extract_tourney_scoring(driver, year, tourney, schedule)
+            else:
+                extract_field_and_odds(driver, year, tourney, schedule)
 
     except Exception as e:
         print(f"Error in main: {e}")
