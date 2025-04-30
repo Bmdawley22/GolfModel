@@ -98,7 +98,7 @@ def get_tourney_scoring(driver, year, tourney, schedule):
         # Get the parent link tag from the p tag matching tourney
         tourney_link = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable(
-                (By.XPATH, f"//p[text()='{tourney}']"))
+                (By.XPATH, f"//p[contains(@class, 'vgdvwe') and text()='{tourney}']"))
         ).find_element(By.XPATH, "./ancestor::a")
 
         driver.execute_script("arguments[0].click();", tourney_link)
@@ -148,9 +148,12 @@ def get_tourney_scoring(driver, year, tourney, schedule):
             cell_texts = [cell.text.strip() for cell in cells]
             if len(cell_texts) > 14:
                 cell_texts = cell_texts[:-1]
+            # print(cell_texts)
             # If you want to get rid of the T (tie) in the position
-            if "T" in cell_texts[1]:
-                cell_texts[0].strip("T", "")
+            if "T" in cell_texts[0]:
+                cell_texts[0].replace("T", "")
+            if "(a)" in cell_texts[2]:
+                continue
             # Only add if row has data
             if cell_texts and cell_texts[0] != "WD":
                 data.append(cell_texts)
@@ -182,11 +185,11 @@ def get_tourney_scoring(driver, year, tourney, schedule):
         )
         print("Calcualted AVG_SCORE and added the column")
 
-        # Inverted z-score normalization
+        # Inverted z-score normalization (lower score = better)
         df["AVG_SCORE_Z"] = round((df["AVG_SCORE"].mean() -
                                    df["AVG_SCORE"]) / df["AVG_SCORE"].std(), 4)
 
-        print("Calculated normalized average score.")
+        print("Calculated normalized average score and added column AVG_SCORE_Z.")
 
         n_rows = len(df)
 
@@ -216,21 +219,25 @@ def get_tourney_scoring(driver, year, tourney, schedule):
 
 def main():
     parser = argparse.ArgumentParser(description="PGA Tour Model")
-    parser.add_argument("year")
+    # Example console command
+    parser.add_argument('--years', nargs='+', type=int,
+                        help='List of years to process')
 
     args = parser.parse_args()
 
     try:
         driver = setup_driver()
 
-        schedule = get_schedule(driver, args.year)
+        for year in args.years:
 
-        # commented out while developing
-        tourney = select_tourney(schedule)
+            schedule = get_schedule(driver, year)
 
-        # players, scores_per_rd =
-        # hard coded tourney to be CJ cup for developing, "tourney" should be the arg
-        get_tourney_scoring(driver, args.year, tourney, schedule)
+            # commented out while developing
+            tourney = select_tourney(schedule)
+
+            # players, scores_per_rd =
+            # hard coded tourney to be CJ cup for developing, "tourney" should be the arg
+            get_tourney_scoring(driver, year, tourney, schedule)
 
     except Exception as e:
         print(f"Error in main: {e}")
