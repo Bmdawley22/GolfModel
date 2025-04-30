@@ -361,7 +361,7 @@ def main():
 
         # # Save to CSV
         combined_df.to_csv(
-            f"ytd_thru_{selected_tourney}_{args.year}.csv", index=False)
+            f"ytd_thru_{selected_tourney.replace(" ", "_")}_{args.year}.csv", index=False)
         print(f"Data exported to ytd_thru_{selected_tourney}_{args.year}.csv")
         # combined_df.to_csv(
         #     f"temp.csv", index=False)

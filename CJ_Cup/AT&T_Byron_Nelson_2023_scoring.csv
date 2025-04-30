@@ -1,0 +1,159 @@
+POS,PLAYER,TOTAL,THRU,R1,R2,R3,R4,STROKES,AVG_SCORE,AVG_SCORE_Z,YEAR,TOURNAMENT,SCHEDULE
+1,Jason Day,-23,F,64,69,66,62,261,65.25,1.8483333521304877,2023,AT&T Byron Nelson,Fortinet Championship
+T2,Si Woo Kim,-22,F,65,66,68,63,262,65.5,1.7396078608286942,,,Presidents Cup
+T2,Austin Eckroat,-22,F,69,65,63,65,262,65.5,1.7396078608286942,,,Sanderson Farms Championship
+4,C.T. Pan,-21,F,67,66,68,62,263,65.75,1.6308823695269008,,,Shriners Children's Open
+T5,Scottie Scheffler,-20,F,64,64,71,65,264,66.0,1.5221568782251074,,,ZOZO CHAMPIONSHIP
+T5,Tyrrell Hatton,-20,F,68,67,65,64,264,66.0,1.5221568782251074,,,THE CJ CUP in South Carolina
+T5,Zecheng Dou,-20,F,63,70,64,67,264,66.0,1.5221568782251074,,,Butterfield Bermuda Championship
+T8,Adam Scott,-19,F,63,71,68,63,265,66.25,1.4134313869233142,,,World Wide Technology Championship
+T8,Vincent Norrman,-19,F,68,66,65,66,265,66.25,1.4134313869233142,,,Cadence Bank Houston Open
+T8,Ryan Palmer,-19,F,64,65,68,68,265,66.25,1.4134313869233142,,,The RSM Classic
+T11,Stephan Jaeger,-18,F,67,71,65,63,266,66.5,1.3047058956215207,,,Hero World Challenge
+T11,Kevin Tway,-18,F,66,71,66,63,266,66.5,1.3047058956215207,,,QBE Shootout
+T11,Richy Werenski,-18,F,64,68,68,66,266,66.5,1.3047058956215207,,,Sentry Tournament of Champions
+T14,Peter Kuest,-17,F,70,67,67,63,267,66.75,1.1959804043197273,,,Sony Open in Hawaii
+T14,Mackenzie Hughes,-17,F,65,64,73,65,267,66.75,1.1959804043197273,,,The American Express
+T14,Byeong Hun An,-17,F,67,67,68,65,267,66.75,1.1959804043197273,,,Farmers Insurance Open
+T14,Carson Young,-17,F,70,68,63,66,267,66.75,1.1959804043197273,,,AT&T Pebble Beach Pro-Am
+T14,Sung Kang,-17,F,66,68,66,67,267,66.75,1.1959804043197273,,,WM Phoenix Open
+T19,Seamus Power,-16,F,69,66,69,64,268,67.0,1.0872549130179339,,,The Genesis Invitational
+T19,Doug Ghim,-16,F,65,70,69,64,268,67.0,1.0872549130179339,,,The Honda Classic
+T19,Scott Piercy,-16,F,64,69,69,66,268,67.0,1.0872549130179339,,,Arnold Palmer Invitational presented by Mastercard
+T19,Joseph Bramlett,-16,F,68,67,67,66,268,67.0,1.0872549130179339,,,Puerto Rico Open
+T23,Eric Cole,-15,F*,66,68,70,65,269,67.25,0.9785294217161405,,,THE PLAYERS Championship
+T23,Trevor Cone,-15,F,67,68,69,65,269,67.25,0.9785294217161405,,,Valspar Championship
+T23,Hideki Matsuyama,-15,F,66,67,70,66,269,67.25,0.9785294217161405,,,World Golf Championships-Dell Technologies Match Play
+T23,Nate Lashley,-15,F*,67,70,68,64,269,67.25,0.9785294217161405,,,Corales Puntacana Championship
+T23,Brandon Wu,-15,F*,70,68,67,64,269,67.25,0.9785294217161405,,,Valero Texas Open
+T23,Christiaan Bezuidenhout,-15,F,68,69,66,66,269,67.25,0.9785294217161405,,,Masters Tournament
+T23,Aaron Baddeley,-15,F,71,65,66,67,269,67.25,0.9785294217161405,,,RBC Heritage
+T30,Matthew NeSmith,-14,F,68,69,67,66,270,67.5,0.8698039304143471,,,Zurich Classic of New Orleans
+T30,Garrick Higgo,-14,F*,69,68,68,65,270,67.5,0.8698039304143471,,,Mexico Open at Vidanta
+T30,Doc Redman,-14,F*,65,69,71,65,270,67.5,0.8698039304143471,,,Wells Fargo Championship
+T30,Patton Kizzire,-14,F,66,70,64,70,270,67.5,0.8698039304143471,,,AT&T Byron Nelson
+T34,Adam Hadwin,-13,F,67,70,67,67,271,67.75,0.7610784391125537,,,PGA Championship
+T34,Martin Laird,-13,F*,72,66,66,67,271,67.75,0.7610784391125537,,,Charles Schwab Challenge
+T34,Tommy Gainey,-13,F,69,68,67,67,271,67.75,0.7610784391125537,,,the Memorial Tournament presented by Workday
+T34,Stewart Cink,-13,F*,73,65,66,67,271,67.75,0.7610784391125537,,,RBC Canadian Open
+T34,Augusto Núñez,-13,F*,66,70,69,66,271,67.75,0.7610784391125537,,,U.S. Open
+T34,Luke List,-13,F*,64,72,70,65,271,67.75,0.7610784391125537,,,Travelers Championship
+T34,Tom Kim,-13,F*,71,66,69,65,271,67.75,0.7610784391125537,,,Rocket Mortgage Classic
+T34,Henrik Norlander,-13,F,66,67,69,69,271,67.75,0.7610784391125537,,,John Deere Classic
+T34,Sam Stevens,-13,F,65,68,69,69,271,67.75,0.7610784391125537,,,Genesis Scottish Open
+T43,Jonathan Byrd,-12,F*,70,68,66,68,272,68.0,0.6523529478107604,,,Barbasol Championship
+T43,Satoshi Kodaira,-12,F*,68,70,66,68,272,68.0,0.6523529478107604,,,The Open Championship
+T43,Matt Kuchar,-12,F,67,68,69,68,272,68.0,0.6523529478107604,,,Barracuda Championship
+T43,Tom Hoge,-12,F*,67,69,69,67,272,68.0,0.6523529478107604,,,3M Open
+T43,Justin Lower,-12,F,66,70,68,68,272,68.0,0.6523529478107604,,,Wyndham Championship
+T43,Robby Shelton,-12,F,70,67,66,69,272,68.0,0.6523529478107604,,,FedEx St. Jude Championship
+T43,Sangmoon Bae,-12,F,66,68,68,70,272,68.0,0.6523529478107604,,,BMW Championship
+T50,Cameron Champ,-11,F*,70,68,66,69,273,68.25,0.5436274565089669,,,TOUR Championship
+T50,Ryan Armour,-11,F,71,66,67,69,273,68.25,0.5436274565089669,,,Fortinet Championship
+T50,Taylor Montgomery,-11,F,71,66,66,70,273,68.25,0.5436274565089669,,,Ryder Cup
+T50,Chris Stroud,-11,F,68,68,67,70,273,68.25,0.5436274565089669,,,Sanderson Farms Championship
+T50,Chad Ramey,-11,F*,66,71,69,67,273,68.25,0.5436274565089669,,,Shriners Children's Open
+T50,K.H. Lee,-11,F*,70,68,68,67,273,68.25,0.5436274565089669,,,ZOZO CHAMPIONSHIP
+T50,Adam Long,-11,F*,71,65,71,66,273,68.25,0.5436274565089669,,,World Wide Technology Championship
+T50,Scott Harrington,-11,F,68,68,66,71,273,68.25,0.5436274565089669,,,Butterfield Bermuda Championship
+T50,Tano Goya,-11,F*,69,68,70,66,273,68.25,0.5436274565089669,,,The RSM Classic
+T50,Harrison Endycott,-11,F*,69,64,74,66,273,68.25,0.5436274565089669,,,Hero World Challenge
+T50,James Hahn,-11,F,67,69,66,71,273,68.25,0.5436274565089669,,,Grant Thornton Invitational
+T50,Sean O'Hair,-11,F,65,69,67,72,273,68.25,0.5436274565089669,,,PGA TOUR Q-School presented by Korn Ferry
+T50,S.H. Kim,-11,F*,66,68,74,65,273,68.25,0.5436274565089669,,,
+T50,Aaron Wise,-11,F*,68,70,71,64,273,68.25,0.5436274565089669,,,
+T64,William McGirt,-10,F*,71,65,71,67,274,68.5,0.43490196520717356,,,
+T64,Ryan Brehm,-10,F*,69,68,71,66,274,68.5,0.43490196520717356,,,
+T64,Parker Coody,-10,F*,69,67,74,64,274,68.5,0.43490196520717356,,,
+T67,David Micheluzzi,-9,F*,65,73,67,70,275,68.75,0.3261764739053802,,,
+T67,Robert Streb,-9,F*,68,70,69,68,275,68.75,0.3261764739053802,,,
+T67,Andrew Novak,-9,F*,66,72,70,67,275,68.75,0.3261764739053802,,,
+T70,Greg Chalmers,-8,F*,69,65,73,69,276,69.0,0.21745098260358678,,,
+T70,Jim Herman,-8,F*,67,71,70,68,276,69.0,0.21745098260358678,,,
+T70,Will Gordon,-8,F*,69,67,73,67,276,69.0,0.21745098260358678,,,
+T70,Davis Thompson,-8,F*,72,66,71,67,276,69.0,0.21745098260358678,,,
+T74,Bill Haas,-7,F*,68,69,68,72,277,69.25,0.10872549130179339,,,
+T74,Jimmy Walker,-7,F*,69,66,72,70,277,69.25,0.10872549130179339,,,
+T74,S.Y. Noh,-7,F*,60,74,73,70,277,69.25,0.10872549130179339,,,
+T77,Brice Garnett,-6,F*,67,71,67,73,278,69.5,0.0,,,
+T77,Fabián Gómez,-6,F*,68,70,73,67,278,69.5,0.0,,,
+T79,Roger Sloan,-4,F*,68,68,70,74,280,70.0,-0.21745098260358678,,,
+T79,Lucas Glover,-4,F*,72,66,70,72,280,70.0,-0.21745098260358678,,,
+T79,Vince Whaley,-4,F*,73,65,71,71,280,70.0,-0.21745098260358678,,,
+T79,Kelly Kraft,-4,F*,69,67,77,67,280,70.0,-0.21745098260358678,,,
+T83,Brent Grant,-3,F*,68,70,69,74,281,70.25,-0.3261764739053802,,,
+T83,Harry Hall,-3,F*,67,70,74,70,281,70.25,-0.3261764739053802,,,
+CUT,Davis Riley,-3,-,67,72,-,-,139,69.5,0.0,,,
+CUT,Dylan Frittelli,-3,-,70,69,-,-,139,69.5,0.0,,,
+CUT,Dylan Wu,-3,-,66,73,-,-,139,69.5,0.0,,,
+CUT,Michael Gligic,-3,-,69,70,-,-,139,69.5,0.0,,,
+CUT,Austin Cook,-3,-,68,71,-,-,139,69.5,0.0,,,
+CUT,Greyson Sigg,-3,-,67,72,-,-,139,69.5,0.0,,,
+CUT,Charley Hoffman,-3,-,70,69,-,-,139,69.5,0.0,,,
+CUT,David Lipsky,-3,-,71,68,-,-,139,69.5,0.0,,,
+CUT,Adam Schenk,-3,-,68,71,-,-,139,69.5,0.0,,,
+CUT,Matthias Schwab,-3,-,69,70,-,-,139,69.5,0.0,,,
+CUT,Kevin Roy,-3,-,69,70,-,-,139,69.5,0.0,,,
+CUT,Ben Griffin,-2,-,72,68,-,-,140,70.0,-0.21745098260358678,,,
+CUT,"Ted Potter, Jr.",-2,-,72,68,-,-,140,70.0,-0.21745098260358678,,,
+CUT,D.J. Trahan,-2,-,72,68,-,-,140,70.0,-0.21745098260358678,,,
+CUT,Maverick McNealy,-2,-,72,68,-,-,140,70.0,-0.21745098260358678,,,
+CUT,Grayson Murray,-2,-,71,69,-,-,140,70.0,-0.21745098260358678,,,
+CUT,Tyson Alexander,-2,-,67,73,-,-,140,70.0,-0.21745098260358678,,,
+CUT,Aaron Rai,-2,-,71,69,-,-,140,70.0,-0.21745098260358678,,,
+CUT,Ryan Moore,-2,-,69,71,-,-,140,70.0,-0.21745098260358678,,,
+CUT,Russell Knox,-1,-,71,70,-,-,141,70.5,-0.43490196520717356,,,
+CUT,Jonas Blixt,-1,-,73,68,-,-,141,70.5,-0.43490196520717356,,,
+CUT,Taylor Bibbs,-1,-,74,67,-,-,141,70.5,-0.43490196520717356,,,
+CUT,Mac Meissner,-1,-,71,70,-,-,141,70.5,-0.43490196520717356,,,
+CUT,Austin Smotherman,-1,-,71,70,-,-,141,70.5,-0.43490196520717356,,,
+CUT,Bo Van Pelt,-1,-,72,69,-,-,141,70.5,-0.43490196520717356,,,
+CUT,Kevin Chappell,-1,-,69,72,-,-,141,70.5,-0.43490196520717356,,,
+CUT,Logan McCracken,-1,-,73,68,-,-,141,70.5,-0.43490196520717356,,,
+CUT,"Bobby Massa
+(a)",-1,-,69,72,-,-,141,70.5,-0.43490196520717356,,,
+CUT,Kyle Stanley,E,-,71,71,-,-,142,71.0,-0.6523529478107604,,,
+CUT,Robert Garrigus,E,-,69,73,-,-,142,71.0,-0.6523529478107604,,,
+CUT,Erik van Rooyen,E,-,71,71,-,-,142,71.0,-0.6523529478107604,,,
+CUT,Scott Brown,E,-,68,74,-,-,142,71.0,-0.6523529478107604,,,
+CUT,Trey Mullinax,E,-,71,71,-,-,142,71.0,-0.6523529478107604,,,
+CUT,Brian Stuard,E,-,74,68,-,-,142,71.0,-0.6523529478107604,,,
+CUT,Chesson Hadley,E,-,67,75,-,-,142,71.0,-0.6523529478107604,,,
+CUT,Justin Suh,E,-,68,74,-,-,142,71.0,-0.6523529478107604,,,
+CUT,Kevin Stadler,E,-,73,69,-,-,142,71.0,-0.6523529478107604,,,
+CUT,J.J. Killeen,E,-,72,70,-,-,142,71.0,-0.6523529478107604,,,
+CUT,Harry Higgs,+1,-,69,74,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Cameron Percy,+1,-,69,74,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Martin Trainer,+1,-,71,72,-,-,143,71.5,-0.8698039304143471,,,
+CUT,George McNeill,+1,-,71,72,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Cody Gribble,+1,-,70,73,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Pierceson Coody,+1,-,68,75,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Tyler Duncan,+1,-,70,73,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Scott Stallings,+1,-,70,73,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Michael Kim,+1,-,69,74,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Wesley Bryan,+1,-,69,74,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Geoff Ogilvy,+1,-,70,73,-,-,143,71.5,-0.8698039304143471,,,
+CUT,Trevor Werbylo,+2,-,71,73,-,-,144,72.0,-1.0872549130179339,,,
+CUT,Min Woo Lee,+2,-,69,75,-,-,144,72.0,-1.0872549130179339,,,
+CUT,Nick Watney,+2,-,72,72,-,-,144,72.0,-1.0872549130179339,,,
+CUT,Max McGreevy,+3,-,72,73,-,-,145,72.5,-1.3047058956215207,,,
+CUT,Jason Dufner,+3,-,71,74,-,-,145,72.5,-1.3047058956215207,,,
+CUT,Kyle Westmoreland,+3,-,70,75,-,-,145,72.5,-1.3047058956215207,,,
+CUT,Carl Yuan,+3,-,70,75,-,-,145,72.5,-1.3047058956215207,,,
+CUT,Ricky Barnes,+4,-,73,73,-,-,146,73.0,-1.5221568782251074,,,
+CUT,Brandon Matthews,+4,-,73,73,-,-,146,73.0,-1.5221568782251074,,,
+CUT,Kramer Hickok,+4,-,72,74,-,-,146,73.0,-1.5221568782251074,,,
+CUT,MJ Daffue,+4,-,73,73,-,-,146,73.0,-1.5221568782251074,,,
+CUT,Matti Schmid,+4,-,73,73,-,-,146,73.0,-1.5221568782251074,,,
+CUT,Ben Crane,+5,-,74,73,-,-,147,73.5,-1.7396078608286942,,,
+CUT,Andrew Landry,+5,-,75,72,-,-,147,73.5,-1.7396078608286942,,,
+CUT,Ryan Gerard,+5,-,71,76,-,-,147,73.5,-1.7396078608286942,,,
+CUT,Jeffrey Kang,+5,-,76,71,-,-,147,73.5,-1.7396078608286942,,,
+CUT,Paul Haley II,+5,-,72,75,-,-,147,73.5,-1.7396078608286942,,,
+CUT,Troy Merritt,+6,-,74,74,-,-,148,74.0,-1.957058843432281,,,
+CUT,D.A. Points,+6,-,72,76,-,-,148,74.0,-1.957058843432281,,,
+CUT,Derek Ernst,+8,-,78,72,-,-,150,75.0,-2.3919608086394546,,,
+CUT,"William Knauth
+(a)",+8,-,79,71,-,-,150,75.0,-2.3919608086394546,,,
+CUT,Richard S. Johnson,+11,-,80,73,-,-,153,76.5,-3.0443137564502147,,,
+CUT,Derek Lamely,+11,-,74,79,-,-,153,76.5,-3.0443137564502147,,,

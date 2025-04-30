@@ -182,8 +182,9 @@ def get_tourney_scoring(driver, year, tourney, schedule):
         )
         print("Calcualted AVG_SCORE and added the column")
 
-        df["AVG_SCORE_Z"] = (df["AVG_SCORE"].mean() -
-                             df["AVG_SCORE"]) / df["AVG_SCORE"].std()
+        # Inverted z-score normalization
+        df["AVG_SCORE_Z"] = round((df["AVG_SCORE"].mean() -
+                                   df["AVG_SCORE"]) / df["AVG_SCORE"].std(), 4)
 
         print("Calculated normalized average score.")
 
