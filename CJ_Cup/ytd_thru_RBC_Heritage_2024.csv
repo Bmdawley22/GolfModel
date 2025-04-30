@@ -1,4 +1,4 @@
-Player,Average Driving Distance,Ball Speed,Driving Accuracy,Distance From Edge of Fairway,Rough Tendency,GIR,Fairway Proximity,Approaches from > 200,Going for Green,GIR from Other than Fairway,Proximity from Sand (Short),Proximity from Rough (Short),Proximity from 30+,Proximity ATG,3-Putt Avoidance,Putting 5-15ft
+PLAYERS,Average Driving Distance,Ball Speed,Driving Accuracy,Distance From Edge of Fairway,Rough Tendency,GIR,Fairway Proximity,Approaches from > 200,Going for Green,GIR from Other than Fairway,Proximity from Sand (Short),Proximity from Rough (Short),Proximity from 30+,Proximity ATG,3-Putt Avoidance,Putting 5-15ft
 Aaron Baddeley,282.4,169.32,0.5482,35.43,0.3028,0.6042,36.0,56.99,0.3636,0.5076,7.26,7.1,13.35,6.54,0.0139,0.5478
 Aaron Rai,290.9,172.16,0.7017,24.09,0.218,0.6993,31.94,48.44,0.5364,0.5827,8.15,8.01,11.9,6.63,0.0294,0.4362
 Adam Hadwin,296.3,174.81,0.6921,24.67,0.2667,0.6431,29.0,50.85,0.7,0.4917,8.97,8.56,14.29,7.73,0.0152,0.4896

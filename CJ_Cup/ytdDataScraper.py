@@ -265,7 +265,7 @@ def scrape_pga_table(url, stat_name="Average_Driving_Distance", stat_year="2024"
 
         # Create a DataFrame
         if players and averages:
-            data = {"Player": players, stat_name: averages}
+            data = {"PLAYERS": players, stat_name: averages}
             df = pd.DataFrame(data)
             return df, selected_tourney, tourney_before_selected
         else:
@@ -343,17 +343,17 @@ def main():
         else:
             print(f"Failed to scrape data from {url}")
 
-    # Combine all DataFrames on the "Player" column
+    # Combine all DataFrames on the "PLAYERS" column
     if all_dfs:
         # Start with the first DataFrame
         combined_df = all_dfs[0]
 
         # Merge with the remaining DataFrames
         for df in all_dfs[1:]:
-            combined_df = combined_df.merge(df, on="Player", how="outer")
+            combined_df = combined_df.merge(df, on="PLAYERS", how="outer")
 
-        # Sort by Player name for consistency
-        combined_df = combined_df.sort_values("Player").reset_index(drop=True)
+        # Sort by PLAYERS name for consistency
+        combined_df = combined_df.sort_values("PLAYERS").reset_index(drop=True)
 
         # Print the combined DataFrame
         print("\nCombined DataFrame:")
