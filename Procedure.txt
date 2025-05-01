@@ -2,15 +2,38 @@
     - This is done by running:
         python tourneyScoringScraper.py
 
+    - First update the tourney_folder to the folder with the tourney data .csv'scoring
+        - EX: tourney_folder = "CJ_Cup"
+
     - To get scoring data for all completed tournaments
         - Use --years flag
-            - EX: --years 2021 2022 2023 2024
+            - EX: --years 2021 2022 2023 2024 --tourney-completed
         - Don't use current year as an input here
+        - Also need to use flag --tourneycompleted
+            - When this flag is set the script will extract the tourney scoring data 
+              as well as calculate AVG_SCORE and AVG_SCORE_Z (normalized)
 
     - To get the field and odds for the upcoming tournament
         - Use --years *current_year*
             - EX: --years 2025
-        - Also need to use flag --tourneycompleted
-            - When this flag is set the script will only extract the field of players playing and their odds to win
+        - When this flag is not set the script will only extract the field of players playing and their odds to win
         - Putting the two arguments together:
-            - EX: python tourneyScoringScraper.py --years 2025 --tourney-completed
+            - EX: python tourneyScoringScraper.py --years 2025
+
+    - Data will be extracted into f"{tourney_folder}/{tourney.replace(" ", "_")}_{year}_scoring.csv"
+
+2. Get year to date data up to the tournament you're modeling
+    - This is done by running:
+        - python ytdDataScraper.py
+
+    - First update the tourney_folder to the folder with the tourney data .csv'scoring
+        - EX: tourney_folder = "CJ_Cup"
+
+    - Need to input the year as an argument in the console command
+        - python ytdDataScraper.py *year you want data for*
+            - EX: python ytdDataScraper.py 2025
+
+    - Script will take a while to loop through each stat and extract it 
+        - Will extract to f"{tourney_folder}/ytd_thru_{selected_tourney.replace(" ", "_")}_{args.year}.csv"
+
+3. 

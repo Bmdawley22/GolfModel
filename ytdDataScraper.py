@@ -289,6 +289,8 @@ def main():
 
     args = parser.parse_args()
 
+    tourney_folder = "CJ_Cup"
+
     # List of URLs and corresponding stat names
     # You'll update this list with the actual URLs and stat names
     url_list = [
@@ -365,17 +367,18 @@ def main():
 
         # # Save to CSV
         combined_df.to_csv(
-            f"ytd_thru_{selected_tourney.replace(" ", "_")}_{args.year}.csv", index=False)
-        print(f"Data exported to ytd_thru_{selected_tourney}_{args.year}.csv")
+            f"{tourney_folder}/ytd_thru_{selected_tourney.replace(" ", "_")}_{args.year}.csv", index=False)
+        print(
+            f"Data exported to {tourney_folder}/ytd_thru_{selected_tourney}_{args.year}.csv")
         # combined_df.to_csv(
-        #     f"temp.csv", index=False)
+        #     f"{tourney_folder}/temp.csv", index=False)
         # print(f"Data exported to temp.csv")
 
         # Export Stat Name URLS to stat_name_urls.csv
         # df = pd.DataFrame(url_list)[["stat_name", "url"]]
         # df.columns = ["Stat Names", "URLs"]
 
-        # df.to_csv(f"stat_names_urls.csv", index=False)
+        # df.to_csv(f"{tourney_folder}/stat_names_urls.csv", index=False)
     else:
         print("No data to combine.")
 
