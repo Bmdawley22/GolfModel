@@ -5,11 +5,12 @@ import glob
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.impute import SimpleImputer
+import subprocess
 
 
-def find_earliest_year_and_years_to_model():
+def find_earliest_year_and_years_to_model(tourney_folder):
     # Find all CSV files containing "_scoring.csv"
-    scoring_files = glob.glob(f"*_scoring.csv")
+    scoring_files = glob.glob(f"{tourney_folder}/*_scoring.csv")
     if not scoring_files:
         raise FileNotFoundError(f"No scoring CSV files found in this folder.")
 
@@ -36,10 +37,10 @@ def find_earliest_year_and_years_to_model():
     return earliest_year, years_to_model
 
 
-def load_scoring_data(year_to_model):
+def load_scoring_data(year_to_model, tourney_folder):
     print(f"\nRunning load_scoring_data for year_to_model: {year_to_model}")
     # Find the scoring CSV file for the given year and tournament
-    files = glob.glob(f"*{year_to_model}_scoring.csv")
+    files = glob.glob(f"{tourney_folder}/*{year_to_model}_scoring.csv")
     if not files:
         raise FileNotFoundError(
             f"No scoring CSV file found for year: {year_to_model}.")
@@ -59,7 +60,7 @@ def load_scoring_data(year_to_model):
     return players, avg_scores
 
 
-def load_prev_scoring_z_and_calc_year_weights(earliest_year, year_to_model, years_to_model):
+def load_prev_scoring_z_and_calc_year_weights(earliest_year, year_to_model, years_to_model, tourney_folder):
     print(
         f"\nRunning load_prev_scoring_z_and_calc_year_weights for year_to_model: {year_to_model}")
     # Get all years before the current year we are modeling
@@ -78,7 +79,7 @@ def load_prev_scoring_z_and_calc_year_weights(earliest_year, year_to_model, year
     # Load scoring data for each previous year
     past_scores = {}
     for year in prev_years:
-        files = glob.glob(f"*{year}_scoring.csv")
+        files = glob.glob(f"{tourney_folder}/*{year}_scoring.csv")
         if not files:
             continue
 
@@ -163,9 +164,9 @@ def compute_weighted_avg_scores(model_players, past_scores_z, year_weights):
     return np.round(weighted_avg, 4)
 
 
-def load_ytd_data(year_to_model):
+def load_ytd_data(year_to_model, tourney_folder):
     # Find YTD data for the year (earliest year + 1 for the first iteration)
-    files = glob.glob(f"ytd_thru*{year_to_model}.csv")
+    files = glob.glob(f"{tourney_folder}/*ytd_thru*{year_to_model}.csv")
     if not files:
         raise FileNotFoundError(
             f"No YTD CSV file found for year {year_to_model}.")
@@ -202,7 +203,7 @@ def load_ytd_data(year_to_model):
     return df
 
 
-def run_multi_year_regression(earliest_year, years_to_model):
+def run_multi_year_regression(earliest_year, years_to_model, tourney_folder):
     combined_df = None
 
     # Iterate through each year from the year after the earliest_year to the latest completed tourney
@@ -211,16 +212,17 @@ def run_multi_year_regression(earliest_year, years_to_model):
             f"\n//////////////\nProcessing year to model {year_to_model}...\n//////////////\n")
 
         # Load scoring data for only the current year to model in the for loop
-        model_players, scores_to_model = load_scoring_data(year_to_model)
+        model_players, scores_to_model = load_scoring_data(
+            year_to_model, tourney_folder)
 
         # Load previous years' normalized scoring data and compute year weights
         past_scores_z, weights = load_prev_scoring_z_and_calc_year_weights(earliest_year,
-                                                                           year_to_model, years_to_model)
+                                                                           year_to_model, years_to_model, tourney_folder)
         # Computes each players yearly weighted AVG_SCORE_Z for previous tournaments based on current year_to_model
         weighted_avg_scores = compute_weighted_avg_scores(
             model_players, past_scores_z, weights)
 
-        ytd_df = load_ytd_data(year_to_model)
+        ytd_df = load_ytd_data(year_to_model, tourney_folder)
 
         # Create DataFrame for the current year
         year_df = pd.DataFrame({
@@ -276,7 +278,7 @@ def run_multi_year_regression(earliest_year, years_to_model):
         'Coefficient': list(model.coef_) + [model.intercept_]
     })
     weights_df['Coefficient'] = weights_df['Coefficient'].round(4)
-    weights_filename = "multi_year_regression_weights.csv"
+    weights_filename = f"{tourney_folder}/multi_year_regression_weights.csv"
     weights_df.to_csv(weights_filename, index=False)
     print(f"Regression weights saved to {weights_filename}")
 
@@ -308,7 +310,7 @@ def run_multi_year_regression(earliest_year, years_to_model):
                        value=rounded_predictions)
 
     # Save the combined DataFrame
-    output_file = "multi_year_model.csv"
+    output_file = f"{tourney_folder}/multi_year_model.csv"
     combined_df.to_csv(output_file, index=False)
     print(f"Combined data saved to {output_file}")
 
@@ -321,15 +323,21 @@ def main():
 
     args = parser.parse_args()
 
+    tourney_folder = "CJ_Cup"
+
     try:
         # Find the earliest year that we have tournament stats and years we can model
-        earliest_year, years_to_model = find_earliest_year_and_years_to_model()
+        earliest_year, years_to_model = find_earliest_year_and_years_to_model(
+            tourney_folder)
 
         # Run the multi-year regression
-        run_multi_year_regression(earliest_year, years_to_model)
+        run_multi_year_regression(
+            earliest_year, years_to_model, tourney_folder)
 
         if args.predict_next_tourney:
-            
+            print("Running subprocess: python runSingleyearRegression.py 2025...")
+            subprocess.run(["python", "runSingleYearRegression.py", "2025"])
+            print("Predictions made for 2025.")
 
     except Exception as e:
         print(f"Error in main: {e}")

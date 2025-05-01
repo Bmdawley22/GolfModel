@@ -20,6 +20,8 @@
         - Putting the two arguments together:
             - EX: python tourneyScoringScraper.py --years 2025
 
+    - Need to select the tournament index from an extracted list of tournaments once the script is ran
+
     - Data will be extracted into f"{tourney_folder}/{tourney.replace(" ", "_")}_{year}_scoring.csv"
 
 2. Get year to date data up to the tournament you're modeling
@@ -32,8 +34,60 @@
     - Need to input the year as an argument in the console command
         - python ytdDataScraper.py *year you want data for*
             - EX: python ytdDataScraper.py 2025
+    
+    - Need to select the tournament index from an extracted list of tournaments once the script is ran
 
     - Script will take a while to loop through each stat and extract it 
         - Will extract to f"{tourney_folder}/ytd_thru_{selected_tourney.replace(" ", "_")}_{args.year}.csv"
 
-3. 
+3. Running runSingleYearRegression.py 
+    -  First update the tourney_folder to the folder with the tourney data .csv'scoring
+        - EX: tourney_folder = "CJ_Cup"
+
+    - This function can be used for two different things
+        1. Running a single tournament regression
+            - EX: python runSingleYearRegression.py 2024 --tourney-completed
+            - This would run a regression on a single year's tournament
+            - Gets model year's tournament scoring data for regression from f"{tourney_folder}/*{year}_scoring.csv"
+            - Gets all of the "_scoring.csv" files for years previous to the year you are modeling
+                - Calculates weights for each year
+                - Calculates a single weighted average value for past performance for each player 
+                  in the tourney you are modeling
+            - Gets ytd data for the year of the tourney you are modeling
+            - Performs linear regression on this data and extracts these weights to:
+                - f"{tourney_folder}/{tourney}_{model_year}_weights.csv"
+            - Also predicts average score 
+            - Calcualtes predicted win probability based on predicted score using:
+                - e ^ (- Beta * Predicted_Avg_Score)
+        2. Using previously calculated weights to predict a tourney not yet completed
+            - EX: python runSingleYearRegression.py 2025
+            - Gets the model year's tournament field player names and odds f"{tourney_folder}/*{year}_scoring.csv"
+            - Gets all of the "_scoring.csv" files for years previous to the year you are modeling
+                - Calculates weights for each year
+                - Calculates a single weighted average value for past performance for each player 
+                  in the tourney you are modeling
+            - Gets ytd data for the year of the tourney you are modeling
+            - Extracts regression weights from specified "...weights.csv"
+                - Current EX: f"{tourney_folder}/multi_year_regression_weights.csv"
+                    - This takes the weights resulting from the regression in the script:
+                        - runMultiYearRegression.py
+                    - This regression is over all years we currently have data for in the tourney_folder
+                - If you want to use different weights for the prediction change the weights_filename
+                    EX: f"{tourney_folder}/*{model_year}_weights.csv"
+            - Predicts average score 
+            - Calcualtes predicted win probability based on predicted score using:
+                - e ^ (- Beta * Predicted_Avg_Score)
+
+4. Running runMultiYearRegression
+    - First update the tourney_folder to the folder with the tourney data .csv'scoring
+        - EX: tourney_folder = "CJ_Cup"
+
+    - Optional flag parameter called --predict-next-tourney
+        - EX: python runMultiYearRegression.py
+            - Will construct a table of for scores to model from the earliest "..._scoring.csv"
+              found in the tourney folder up to the last "..._scoring.csv"
+            - Will then run a regression on all of the players scores from each of those tournaments
+        - EX: python runMultiYearRegression.py --predict-next-tourney
+            - If you want to predict a tourney that hasn't been completed
+            - This will still go throuhg the process of running the regression on all years
+            - After the regression is completed, the regression will be used to predict the 2025 tourney

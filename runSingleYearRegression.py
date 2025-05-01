@@ -372,11 +372,14 @@ def calculate_win_probabilities(model_df):
     # Add the win_probabilities as the third column (position 2, after 'Predicted_Avg_Score')
     model_df.insert(loc=2, column='Win_Probability_%', value=win_probabilities)
 
-    print("model_df before reordering by win probability:")
+    print("\nWin probabilities predicted.")
+
+    print("\nmodel_df before reordering by win probability:")
     print(model_df)
 
     # Sort the DataFrame by Win_Probability_% in descending order
     model_df = model_df.sort_values(by='Win_Probability_%', ascending=False)
+
 
     return model_df
 
