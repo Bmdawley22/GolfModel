@@ -1,0 +1,19 @@
+Feature,Coefficient
+Weighted_Avg_Past_Score_Z,-0.0835
+Average Driving Distance,0.0741
+Ball Speed,-0.101
+Driving Accuracy,0.3547
+Distance From Edge of Fairway,-0.1575
+Rough Tendency,-0.3334
+GIR,-0.3178
+Fairway Proximity,0.0026
+Approaches from > 200,0.0886
+Going for Green,-0.4501
+GIR from Other than Fairway,0.0634
+Proximity from Sand (Short),-0.0737
+Proximity from Rough (Short),-0.0532
+Proximity from 30+,-0.0367
+Proximity ATG,-0.032
+3-Putt Avoidance,-0.1655
+Putting 5-15ft,0.0018
+Intercept,68.9448

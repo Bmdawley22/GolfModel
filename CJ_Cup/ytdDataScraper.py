@@ -76,7 +76,7 @@ def select_tourney(driver, prev_selected_tourney='', prev_tourney_before=''):
         # Note: won't be able to locate if you're modeling a tourney before the masters
         tourney_button = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located(
-                (By.XPATH, "//button[text()='Masters Tournament' or text()='The Sentry']"))
+                (By.XPATH, "//button[contains(text(),'Masters') or contains(text(),'Sentry')]"))
         )
 
         print("Masters or Sentry button found")
@@ -330,6 +330,8 @@ def main():
     selected_tourney = ''
     tourney_before_selected = ''
 
+    list_of_stats_unable_to_scrape = []
+
     # Loop through each URL and scrape the data
     for url_info in url_list:
         url = url_info["url"]
@@ -341,6 +343,8 @@ def main():
         if df is not None:
             all_dfs.append(df)
         else:
+            list_of_stats_unable_to_scrape.append(stat_name)
+            print(list_of_stats_unable_to_scrape)
             print(f"Failed to scrape data from {url}")
 
     # Combine all DataFrames on the "PLAYERS" column

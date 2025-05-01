@@ -9,7 +9,7 @@ from sklearn.impute import SimpleImputer
 # Function to extract current year tourney data
 
 
-def load_current_scoring_csv_data(year, is_tourney_completed):
+def load_current_scoring_csv_data(year, tourney_completed):
     # Find CSV file that ends with f"{year}_scoring.csv"
     files = glob.glob(f"*{year}_scoring.csv")
     if not files:
@@ -28,7 +28,7 @@ def load_current_scoring_csv_data(year, is_tourney_completed):
 
     print(f"Model tourney from csv: {tourney}")
     # Either predicting scores or modeling completed tournament
-    if is_tourney_completed:
+    if tourney_completed:
         # Tournament scores to model
         avg_scoring = df["AVG_SCORE"]
         print(f"Average scoring from csv: {avg_scoring}")
@@ -106,7 +106,7 @@ def load_all_prev_avg_scoring_normalized(model_year, players):
     return result_df
 
 
-def compute_weighted_avg_scores(past_scores_df, model_year, odds_perc, is_tourney_completed):
+def compute_weighted_avg_scores(past_scores_df, model_year, odds_perc, tourney_completed):
     # Get the list of years (columns except 'PLAYERS')
     years = [int(col) for col in past_scores_df.columns if col != 'PLAYERS']
 
@@ -145,7 +145,7 @@ def compute_weighted_avg_scores(past_scores_df, model_year, odds_perc, is_tourne
     # Drop PLAYERS column for weighted avg calc
     scores_matrix = past_scores_df.drop(columns=['PLAYERS']).to_numpy()
 
-    if not is_tourney_completed:
+    if not tourney_completed:
         # Add Tourney Odds before weighted average column
         past_scores_df["Odds_Probability_%"] = odds_perc
 
@@ -225,7 +225,7 @@ def load_ytd_data_and_normalize(model_df, model_year):
     return merged_df
 
 
-def perform_linear_regression(avg_scoring_to_model, model_df, model_year, tourney, is_tourney_completed=0):
+def perform_linear_regression(avg_scoring_to_model, model_df, model_year, tourney, tourney_completed=0):
     print("\nRunning perform_linear_regression function...")
 
     # Define the target variable (y) and features (X)
@@ -236,7 +236,7 @@ def perform_linear_regression(avg_scoring_to_model, model_df, model_year, tourne
         'PLAYERS', 'Odds_Probability_%', target_col]]
 
     # Check if we're performing a linear regression on completed tournament
-    if is_tourney_completed == 1:
+    if tourney_completed:
         # Training mode: Fit a new linear regression model
         print("Training linear regression model on completed tournament...")
 
@@ -383,8 +383,8 @@ def calculate_win_probabilities(model_df):
 def main():
     parser = argparse.ArgumentParser(description="PGA Tour Model")
     parser.add_argument("model_year", type=int)
-    parser.add_argument("--is-tourney-completed", type=int, choices=[0, 1], default=0,
-                        help="Set to 1 to predict using pre-existing weights, 0 to train a new model (default: 0)")
+    parser.add_argument('--tourney-completed', action='store_true',
+                        help='Refresh data if this flag is present')
 
     args = parser.parse_args()
 
@@ -393,19 +393,19 @@ def main():
     try:
         # First get data from the current year's (model_year) tournament
         tourney, players, avg_scoring_to_model, odds_perc = load_current_scoring_csv_data(
-            args.model_year, args.is_tourney_completed)
+            args.model_year, args.tourney_completed)
         # Returns current year's player's normalized preivous average round scores tables (-0.1 if not played)
         past_scores_norm_df = load_all_prev_avg_scoring_normalized(
             args.model_year, players)
         # Calculates weighted average of normalized past tournament z-scores
         model_df = compute_weighted_avg_scores(
-            past_scores_norm_df, args.model_year, odds_perc, args.is_tourney_completed)
+            past_scores_norm_df, args.model_year, odds_perc, args.tourney_completed)
         # Merges Weighted_Avg_Past_Score_Z, (Odds_Probability_% or AVG_SCORE), and YTD normalized data
         model_df = load_ytd_data_and_normalize(
             model_df, args.model_year)
-        # Perform linear regression or predict using weights, based on is_tourney_completed flag
+        # Perform linear regression or predict using weights, based on tourney_completed flag
         model_df = perform_linear_regression(avg_scoring_to_model,
-                                             model_df, args.model_year, tourney, args.is_tourney_completed)
+                                             model_df, args.model_year, tourney, args.tourney_completed)
         # Calculate win probabilities
         model_df = calculate_win_probabilities(model_df)
 
