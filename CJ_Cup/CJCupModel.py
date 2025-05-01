@@ -296,7 +296,7 @@ def perform_linear_regression(avg_scoring_to_model, model_df, model_year, tourne
         # Predict-only mode: Use pre-existing weights
         print("\nUsing pre-existing weights to predict average scores...")
 
-        weights_filename = glob.glob(f"*_weights.csv")
+        weights_filename = glob.glob("multi_year_regression_weights.csv")
 
         # Load the weights CSV
         try:
@@ -408,6 +408,9 @@ def main():
                                              model_df, args.model_year, tourney, args.tourney_completed)
         # Calculate win probabilities
         model_df = calculate_win_probabilities(model_df)
+
+        model_df = model_df.sort_values(
+            by="Win_Probability_%", ascending=False)
 
         # Save to CSV
         output_file = f"{tourney}_{args.model_year}_model.csv".replace(
