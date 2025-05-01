@@ -9,9 +9,9 @@ from sklearn.impute import SimpleImputer
 # Function to extract current year tourney data
 
 
-def load_current_scoring_csv_data(year, tourney_completed):
+def load_current_scoring_csv_data(year, tourney_completed, tourney_folder):
     # Find CSV file that ends with f"{year}_scoring.csv"
-    files = glob.glob(f"*{year}_scoring.csv")
+    files = glob.glob(f"{tourney_folder}/*{year}_scoring.csv")
     if not files:
         raise FileNotFoundError(f"No Scoring CSV file found for year {year}.")
 
@@ -47,9 +47,9 @@ def load_current_scoring_csv_data(year, tourney_completed):
     return tourney, players, avg_scoring, odds_perc
 
 
-def load_all_prev_avg_scoring_normalized(model_year, players):
+def load_all_prev_avg_scoring_normalized(model_year, players, tourney_folder):
     # Find all CSV files in the current directory containing "_scoring"
-    all_scoring_files = glob.glob("*_scoring*.csv")
+    all_scoring_files = glob.glob(f"{tourney_folder}/*_scoring*.csv")
 
     # Filter out files containing "{model_year}_scoring"
     prev_tourney_files = [
@@ -170,9 +170,9 @@ def compute_weighted_avg_scores(past_scores_df, model_year, odds_perc, tourney_c
     return past_scores_df
 
 
-def load_ytd_data_and_normalize(model_df, model_year):
+def load_ytd_data_and_normalize(model_df, model_year, tourney_folder):
     # Find CSV file that ends with f"ytd_thru*{model_year}.csv"
-    files = glob.glob(f"ytd_thru*{model_year}.csv")
+    files = glob.glob(f"{tourney_folder}/ytd_thru*{model_year}.csv")
     if not files:
         raise FileNotFoundError(
             f"No YTD CSV file found for year {model_year}.")
@@ -225,7 +225,7 @@ def load_ytd_data_and_normalize(model_df, model_year):
     return merged_df
 
 
-def perform_linear_regression(avg_scoring_to_model, model_df, model_year, tourney, tourney_completed=0):
+def perform_linear_regression(avg_scoring_to_model, model_df, model_year, tourney, tourney_completed, tourney_folder):
     print("\nRunning perform_linear_regression function...")
 
     # Define the target variable (y) and features (X)
@@ -287,7 +287,7 @@ def perform_linear_regression(avg_scoring_to_model, model_df, model_year, tourne
         weights_df['Coefficient'] = weights_df['Coefficient'].round(4)
 
         # Save the coefficients to a CSV file
-        weights_filename = f"{tourney}_{model_year}_weights.csv".replace(
+        weights_filename = f"{tourney_folder}/{tourney}_{model_year}_weights.csv".replace(
             " ", "_")
         weights_df.to_csv(weights_filename, index=False)
         print(f"Regression weights saved to {weights_filename}")
@@ -296,7 +296,8 @@ def perform_linear_regression(avg_scoring_to_model, model_df, model_year, tourne
         # Predict-only mode: Use pre-existing weights
         print("\nUsing pre-existing weights to predict average scores...")
 
-        weights_filename = glob.glob("multi_year_regression_weights.csv")
+        weights_filename = glob.glob(
+            f"{tourney_folder}/multi_year_regression_weights.csv")
 
         # Load the weights CSV
         try:
@@ -387,22 +388,24 @@ def main():
 
     args = parser.parse_args()
 
+    tourney_folder = "CJ_Cup"
+
     try:
         # First get data from the current year's (model_year) tournament
         tourney, players, avg_scoring_to_model, odds_perc = load_current_scoring_csv_data(
-            args.model_year, args.tourney_completed)
+            args.model_year, args.tourney_completed, tourney_folder)
         # Returns current year's player's normalized preivous average round scores tables (-0.1 if not played)
         past_scores_norm_df = load_all_prev_avg_scoring_normalized(
-            args.model_year, players)
+            args.model_year, players, tourney_folder)
         # Calculates weighted average of normalized past tournament z-scores
         model_df = compute_weighted_avg_scores(
             past_scores_norm_df, args.model_year, odds_perc, args.tourney_completed)
         # Merges Weighted_Avg_Past_Score_Z, (Odds_Probability_% or AVG_SCORE), and YTD normalized data
         model_df = load_ytd_data_and_normalize(
-            model_df, args.model_year)
+            model_df, args.model_year, tourney_folder)
         # Perform linear regression or predict using weights, based on tourney_completed flag
         model_df = perform_linear_regression(avg_scoring_to_model,
-                                             model_df, args.model_year, tourney, args.tourney_completed)
+                                             model_df, args.model_year, tourney, args.tourney_completed, tourney_folder)
         # Calculate win probabilities
         model_df = calculate_win_probabilities(model_df)
 
@@ -410,7 +413,7 @@ def main():
             by="Win_Probability_%", ascending=False)
 
         # Save to CSV
-        output_file = f"{tourney}_{args.model_year}_model.csv".replace(
+        output_file = f"{tourney_folder}/{tourney}_{args.model_year}_model.csv".replace(
             " ", "_")
         model_df.to_csv(output_file, index=False)
         print(f"Data saved to {output_file}")
