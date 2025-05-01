@@ -93,7 +93,7 @@ def select_tourney(tournaments):
 # Function to extract tournament scoring data and write to csv
 
 
-def extract_tourney_scoring(driver, year, tourney, schedule):
+def extract_tourney_scoring(driver, year, tourney, schedule, tourney_folder):
     print(f"\nRunning extract_tourney_scoring for {year} {tourney}...\n")
     try:
         driver.get(f"https://www.pgatour.com/schedule/{year}")
@@ -215,15 +215,15 @@ def extract_tourney_scoring(driver, year, tourney, schedule):
         # # Save to CSV
         # tourney = "cj_cup_byron_nelson"  # Set your tourney name dynamically if needed
         df.to_csv(
-            f"{tourney.replace(" ", "_")}_{year}_scoring.csv", index=False)
+            f"{tourney_folder}/{tourney.replace(" ", "_")}_{year}_scoring.csv", index=False)
 
     except Exception as e:
         print(f"Error occurred: {e}")
         return None
 
 
-def extract_field_and_odds(driver, year, tourney, schedule):
-    print(f"\nRunning get_field for {year} {tourney}...\n")
+def extract_field_and_odds(driver, year, tourney, schedule, tourney_folder):
+    print(f"\nRunning extract_field_and_odds for {year} {tourney}...\n")
     try:
         driver.get(f"https://www.pgatour.com/schedule")
 
@@ -316,7 +316,7 @@ def extract_field_and_odds(driver, year, tourney, schedule):
         # # Save to CSV
         # tourney = "cj_cup_byron_nelson"  # Set your tourney name dynamically if needed
         df.to_csv(
-            f"{tourney.replace(" ", "_")}_{year}_scoring.csv", index=False)
+            f"{tourney_folder}/{tourney.replace(" ", "_")}_{year}_scoring.csv", index=False)
 
     except Exception as e:
         print(f"Error occurred: {e}")
@@ -328,24 +328,27 @@ def main():
     # Example console command
     parser.add_argument('--years', nargs='+', type=int,
                         help='List of years to process')
-    parser.add_argument("--is-tourney-completed", type=int, choices=[0, 1], default=0,
-                        help="Set to 1 to predict using pre-existing weights, 0 to train a new model (default: 0)")
+    parser.add_argument('--tourney-completed', action='store_true')
 
     args = parser.parse_args()
+
+    tourney_folder = "CJ_Cup"
 
     try:
         driver = setup_driver()
 
         for year in args.years:
 
-            schedule = get_schedule(driver, year, args.is_tourney_completed)
+            schedule = get_schedule(driver, year, args.tourney_completed)
 
             tourney = select_tourney(schedule)
 
-            if args.is_tourney_completed:
-                extract_tourney_scoring(driver, year, tourney, schedule)
+            if args.tourney_completed:
+                extract_tourney_scoring(
+                    driver, year, tourney, schedule, tourney_folder)
             else:
-                extract_field_and_odds(driver, year, tourney, schedule)
+                extract_field_and_odds(
+                    driver, year, tourney, schedule, tourney_folder)
 
     except Exception as e:
         print(f"Error in main: {e}")

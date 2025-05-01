@@ -316,8 +316,10 @@ def run_multi_year_regression(earliest_year, years_to_model):
 def main():
     parser = argparse.ArgumentParser(
         description="PGA Multi-Year Tournament Model")
+    parser.add_argument('--predict-next-tourney', action='store_true',
+                        help='Refresh data if this flag is present')
 
-    # args = parser.parse_args()
+    args = parser.parse_args()
 
     try:
         # Find the earliest year that we have tournament stats and years we can model
@@ -325,6 +327,9 @@ def main():
 
         # Run the multi-year regression
         run_multi_year_regression(earliest_year, years_to_model)
+
+        if args.predict_next_tourney:
+            
 
     except Exception as e:
         print(f"Error in main: {e}")

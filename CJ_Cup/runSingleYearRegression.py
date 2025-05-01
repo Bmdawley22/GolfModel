@@ -383,12 +383,9 @@ def calculate_win_probabilities(model_df):
 def main():
     parser = argparse.ArgumentParser(description="PGA Tour Model")
     parser.add_argument("model_year", type=int)
-    parser.add_argument('--tourney-completed', action='store_true',
-                        help='Refresh data if this flag is present')
+    parser.add_argument('--tourney-completed', action='store_true')
 
     args = parser.parse_args()
-
-    print(args)
 
     try:
         # First get data from the current year's (model_year) tournament

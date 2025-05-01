@@ -1,0 +1,16 @@
+1. Get all individual tournament scoring data
+    - This is done by running:
+        python tourneyScoringScraper.py
+
+    - To get scoring data for all completed tournaments
+        - Use --years flag
+            - EX: --years 2021 2022 2023 2024
+        - Don't use current year as an input here
+
+    - To get the field and odds for the upcoming tournament
+        - Use --years *current_year*
+            - EX: --years 2025
+        - Also need to use flag --tourneycompleted
+            - When this flag is set the script will only extract the field of players playing and their odds to win
+        - Putting the two arguments together:
+            - EX: python tourneyScoringScraper.py --years 2025 --tourney-completed
